@@ -7,7 +7,7 @@ from backend.main import app
 
 def test_plan_endpoint():
     client = TestClient(app)
-    resp = client.post('/plan', json={'goal': 'demo goal'})
+    resp = client.post('/architect/plan', json={'goal': 'demo goal'})
     assert resp.status_code == 200
     data = resp.json()
     assert data['goal'] == 'demo goal'
