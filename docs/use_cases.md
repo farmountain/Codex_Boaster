@@ -15,6 +15,8 @@ Codex Booster automates the full software development lifecycle. The table below
 | **Chat / Improve** | `Chat-Agent` presents reasoning traces and accepts user feedback. | Interact in dashboard chat |
 | **Monetize** | `MonetizerAgent` records usage and charges through Stripe. | automatic |
 | **Marketplace** | `Marketplace Service` lists external connectors and tools. | "Show available LLM adapters" |
+| **Runtime Setup** | `Config-Agent` lets you choose Python, Node.js, Rust and others. | "Use Node.js 20 and Bun" |
+| **Reflexion View** | `ReflexionAgent` shows confidence scores and retry history in the dashboard. | automatic |
 
 
 These activities combine to deliver an autonomous build-test-deploy cycle with persistent memory via HipCortex.
