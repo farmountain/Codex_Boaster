@@ -16,6 +16,13 @@ provides a single interface to HipCortex for logging and memory snapshots.  The
 `build_test_cycle` helper orchestrates BuilderAgent, TesterAgent and
 ReflexionAgent to implement the TDD loop.
 
+The Next.js frontend exposes a sidebar with a project switcher, an **Agent
+Panel** for conversational commands and a real‑time workspace list.  Each
+project stores its runtime configuration (Python, Node, Rust, etc.) and secrets
+in HipCortex so that the agents always operate with the latest context.  Test
+results, confidence scores and retry history are displayed in the Reflexion
+panel alongside a HipCortex memory timeline.
+
 Additional helper modules are planned for configuration and deployment:
 
 - **Config Agent** – generates `.env`, `docker-compose.yml` and other runtime

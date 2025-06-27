@@ -5,6 +5,12 @@ working software.  A set of specialised agents handle planning, code
 generation, testing, reflexion and billing.  All reasoning state is recorded in
 **HipCortex**, enabling a persistent memory of each build attempt.
 
+The current UI is organised around a sidebar project switcher, an **Agent
+Panel** for chat-driven workflows and a modular workspace that lists active
+repositories.  Users select language runtimes such as Python, Node or Rust
+and configure secrets directly in the browser.  Logs and agent confidence
+scores appear in the **Reflexion** panel so you can inspect every decision.
+
 ### Key Features
 
 - **Architect, Builder and Tester agents** follow a test-first workflow.
@@ -17,6 +23,12 @@ generation, testing, reflexion and billing.  All reasoning state is recorded in
   dashboard.
 
 - **Marketplace** lists MCP servers, LLM adapters and database connectors for easy integration
+
+Additional UX highlights:
+
+- **Multi-language runtime selection** allows Python, Node.js, Rust and more per project.
+- **Modular workspaces** display repositories and tasks in real time.
+- **Chat + Codex Agent interface** lets you refine instructions with chain-of-thought reasoning.
 
 
 ## Quickstart

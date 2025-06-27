@@ -3,7 +3,10 @@
 This short guide explains how to try Codex Booster locally. The platform exposes
 an API powered by FastAPI and a small Next.js interface. The dashboard
 presents **Plan**, **Build**, **Test** and **Deploy** actions that drive the
-agent workflow.
+agent workflow. When creating a project you can choose the language runtime
+(Python, Node.js, Rust, Go, Bun, Java, Swift or Ruby) and provide any secrets
+inline. A drop‑down also lets you upload a setup script or open an interactive
+terminal.
 
 Example prompts:
 
@@ -38,6 +41,8 @@ Example prompts:
    - Write tests in the text area.
    - Use the **Plan**, **Build** and **Test** buttons to drive the
      build/test/reflexion loop.
+   - Check the **Reflexion** panel for agent confidence and retry history.
+   - The **Workspace** list shows runtime tags and build status for each repo.
 
 ## Running Tests
 
@@ -51,3 +56,10 @@ cd frontend && npm test --silent && cd ..
 
 The dashboard fetches results from `/test_results` and displays the last
 improvement suggestion from `/improvement_suggestion`.
+
+### UI Testing
+
+Run `npm test --silent` in both the repository root and `frontend/` directory to
+execute the Jest suites.  These include simple UAT flows for the Plan selector
+and reasoning panel components.  All tests should pass before deploying a new
+project.
