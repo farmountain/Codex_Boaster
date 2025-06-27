@@ -8,6 +8,7 @@ class TesterAgent(BaseAgent):
 
     def __init__(self, hipcortex: HipCortexBridge):
         self.hipcortex = hipcortex
+        self.last_output = ""
 
     def run_tests(self, code_path: str) -> bool:
         """Execute tests at ``code_path`` and return ``True`` on success."""
@@ -23,12 +24,13 @@ class TesterAgent(BaseAgent):
         )
 
         success = proc.returncode == 0
+        self.last_output = proc.stdout + proc.stderr
         self.hipcortex.log_event(
             {
                 "agent": "tester",
                 "event": "tests_complete",
                 "success": success,
-                "output": proc.stdout + proc.stderr,
+                "output": self.last_output,
             }
         )
         return success

@@ -8,6 +8,18 @@ class BuilderAgent(BaseAgent):
 
     def __init__(self, hipcortex: HipCortexBridge):
         self.hipcortex = hipcortex
+        self.instructions = ""
+
+    def update_instructions(self, instructions: str) -> None:
+        """Update build strategy based on reflexion."""
+        self.instructions = instructions
+        self.hipcortex.log_event(
+            {
+                "agent": "builder",
+                "event": "update_instructions",
+                "instructions": instructions,
+            }
+        )
 
     def build(self, tests: str) -> str:
         """Return code that passes the provided tests."""
