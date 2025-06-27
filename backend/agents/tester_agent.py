@@ -10,12 +10,25 @@ class TesterAgent(BaseAgent):
         self.hipcortex = hipcortex
 
     def run_tests(self, code_path: str) -> bool:
-        """Execute tests and return success status."""
-        import pytest
+        """Execute tests at ``code_path`` and return ``True`` on success."""
+        import subprocess
+        import sys
 
         self.hipcortex.log_event({"agent": "tester", "event": "run_tests", "path": code_path})
-        # run pytest in quiet mode and return True if exit code is 0
-        result = pytest.main([code_path, "-q"])
-        success = result == 0
-        self.hipcortex.log_event({"agent": "tester", "event": "tests_complete", "success": success})
+
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", code_path, "-q"],
+            capture_output=True,
+            text=True,
+        )
+
+        success = proc.returncode == 0
+        self.hipcortex.log_event(
+            {
+                "agent": "tester",
+                "event": "tests_complete",
+                "success": success,
+                "output": proc.stdout + proc.stderr,
+            }
+        )
         return success
