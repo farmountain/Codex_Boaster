@@ -19,6 +19,7 @@ The system follows a TDD-first workflow guided by six cooperating agents:
 13. **Chat Agent** exposes reasoning traces and accepts instructions from the UI.
 14. **Marketplace Service** manages third-party connectors such as MCP servers, A2A adapters and LLM APIs.
 
+
 All memory and reasoning context flows through `hipcortex_bridge.py`.  The
 `build_test_cycle` function encapsulates the round‑trip from code generation to
 testing and reflexion.

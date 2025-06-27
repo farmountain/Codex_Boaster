@@ -16,4 +16,5 @@ Codex Booster automates the full software development lifecycle. The table below
 | **Monetize** | `MonetizerAgent` records usage and charges through Stripe. | automatic |
 | **Marketplace** | `Marketplace Service` lists external connectors and tools. | "Show available LLM adapters" |
 
+
 These activities combine to deliver an autonomous build-test-deploy cycle with persistent memory via HipCortex.

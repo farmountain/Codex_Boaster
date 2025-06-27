@@ -11,6 +11,7 @@ Example prompts:
 - *"Deploy latest build"* – calls the Deploy agent to provision a preview environment.
 - *"Show marketplace components"* – lists available MCP servers and LLM adapters.
 
+
 ## Backend
 
 1. Install Python dependencies:
