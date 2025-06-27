@@ -4,7 +4,7 @@ from pathlib import Path
 from backend.agents.builder_agent import BuilderAgent
 from backend.agents.tester_agent import TesterAgent as TA
 from backend.integrations.hipcortex_bridge import HipCortexBridge
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, ANY
 
 
 def test_builder_and_tester_integration_passes(tmp_path: Path):
@@ -33,4 +33,4 @@ def test_add():
     assert success
     # ensure tester logged events
     hc.log_event.assert_any_call({"agent": "tester", "event": "run_tests", "path": str(tmp_path)})
-    hc.log_event.assert_any_call({"agent": "tester", "event": "tests_complete", "success": True})
+    hc.log_event.assert_any_call({"agent": "tester", "event": "tests_complete", "success": True, "output": ANY})
