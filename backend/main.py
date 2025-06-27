@@ -16,6 +16,7 @@ from backend.agents.reflexion_agent import ReflexionAgent
 from backend.agents.exporter_agent import ExporterAgent
 from backend.agents.monetizer_agent import MonetizerAgent
 from backend.services.workflow import build_test_cycle
+from backend.services.marketplace import list_components
 
 app = FastAPI(title="Codex Booster")
 app.add_middleware(
@@ -33,6 +34,7 @@ tester_router = APIRouter(prefix="/tester", tags=["tester"])
 reflexion_router = APIRouter(prefix="/reflexion", tags=["reflexion"])
 exporter_router = APIRouter(prefix="/exporter", tags=["exporter"])
 monetizer_router = APIRouter(prefix="/monetizer", tags=["monetizer"])
+marketplace_router = APIRouter(prefix="/marketplace", tags=["marketplace"])
 
 app.include_router(architect_router)
 app.include_router(builder_router)
@@ -40,6 +42,7 @@ app.include_router(tester_router)
 app.include_router(reflexion_router)
 app.include_router(exporter_router)
 app.include_router(monetizer_router)
+app.include_router(marketplace_router)
 
 hipcortex = HipCortexBridge(base_url=os.getenv("HIPCORTEX_URL", "http://hipcortex"))
 architect_agent = ArchitectAgent(hipcortex)
@@ -233,3 +236,9 @@ async def get_test_results():
 async def get_improvement_suggestion():
     """Return the latest improvement suggestion."""
     return latest_improvement
+
+
+@marketplace_router.get("/list")
+async def marketplace_list():
+    """List available marketplace components."""
+    return {"components": list_components()}

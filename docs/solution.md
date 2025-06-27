@@ -10,6 +10,14 @@ The system follows a TDD-first workflow guided by six cooperating agents:
    updates the BuilderAgent instructions.
 5. **ExporterAgent** packages artefacts once tests pass.
 6. **MonetizerAgent** records usage and creates Stripe charges.
+7. **Config Agent** builds runtime files such as `.env` and `docker-compose.yml`.
+8. **Repo‑Init Agent** creates a GitHub repository with CI/CD hooks.
+9. **Integration Agent** wires external APIs (Supabase, Clerk, Stripe, etc.).
+10. **Test‑Suite Agent** generates SIT and UAT plans.
+11. **Deploy Agent** provisions preview deployments.
+12. **Doc Agent** writes usage documentation and UX walkthroughs.
+13. **Chat Agent** exposes reasoning traces and accepts instructions from the UI.
+14. **Marketplace Service** manages third-party connectors such as MCP servers, A2A adapters and LLM APIs.
 
 All memory and reasoning context flows through `hipcortex_bridge.py`.  The
 `build_test_cycle` function encapsulates the round‑trip from code generation to
