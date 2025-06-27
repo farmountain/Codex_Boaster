@@ -17,3 +17,12 @@ def test_add():
     assert isinstance(code, str)
     hc.log_event.assert_any_call({"agent": "builder", "event": "start_build", "tests": tests})
     hc.log_event.assert_any_call({"agent": "builder", "event": "generated_code", "code": code})
+
+
+def test_builder_includes_instructions_comment():
+    hc = HipCortexBridge(base_url="http://test")
+    hc.log_event = MagicMock()
+    builder = BuilderAgent(hc)
+    builder.update_instructions("note")
+    code = builder.build("from generated_module import foo")
+    assert code.startswith("# instructions: note")

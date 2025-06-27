@@ -26,7 +26,11 @@ class BuilderAgent(BaseAgent):
         # very naive TDD cycle - examine tests and generate minimal code
         self.hipcortex.log_event({"agent": "builder", "event": "start_build", "tests": tests})
 
+        # Start from base template and append any stored instructions as a
+        # comment so the generated artifact retains traceability.
         code = "# TODO: generated code"
+        if self.instructions:
+            code = f"# instructions: {self.instructions}\n" + code
 
         if "add(" in tests:
             # simple heuristic to satisfy an add() function test
