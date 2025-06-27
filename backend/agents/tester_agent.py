@@ -6,8 +6,9 @@ from backend.integrations.hipcortex_bridge import HipCortexBridge
 class TesterAgent(BaseAgent):
     """Runs tests for generated code."""
 
-    def __init__(self, hipcortex: HipCortexBridge):
+    def __init__(self, hipcortex: HipCortexBridge, runner: list[str] | None = None) -> None:
         self.hipcortex = hipcortex
+        self.runner = runner
         self.last_output = ""
 
     def run_tests(self, code_path: str) -> bool:
@@ -15,10 +16,13 @@ class TesterAgent(BaseAgent):
         import subprocess
         import sys
 
+        cmd = self.runner or [sys.executable, "-m", "pytest", "-q"]
+        cmd = cmd + [code_path]
+
         self.hipcortex.log_event({"agent": "tester", "event": "run_tests", "path": code_path})
 
         proc = subprocess.run(
-            [sys.executable, "-m", "pytest", code_path, "-q"],
+            cmd,
             capture_output=True,
             text=True,
         )
