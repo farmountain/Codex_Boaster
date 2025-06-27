@@ -1,7 +1,19 @@
 # Technical Solution
 
-Codex Booster orchestrates multiple AI agents, including ArchitectAgent, BuilderAgent, TesterAgent, ReflexionAgent, ExporterAgent, and MonetizerAgent. HipCortex handles all long-term reasoning, memory, and goal alignment. Agents communicate through `hipcortex_bridge.py` to log actions and retrieve previous states.
+The system follows a TDD-first workflow guided by six cooperating agents:
 
-The `TesterAgent` executes Python tests and records results. These results are exposed via the FastAPI endpoint `/test_results` so the frontend can display whether the last build passed or failed.
+1. **ArchitectAgent** breaks a user goal into modules and logs the plan to
+   HipCortex.
+2. **BuilderAgent** generates minimal code to satisfy the tests.
+3. **TesterAgent** runs pytest on the generated code.
+4. **ReflexionAgent** applies the AUREUS reasoning loop to failed test output and
+   updates the BuilderAgent instructions.
+5. **ExporterAgent** packages artefacts once tests pass.
+6. **MonetizerAgent** records usage and creates Stripe charges.
 
-When tests fail, the `ReflexionAgent` analyzes the failure output and updates the `BuilderAgent` instructions. The latest improvement hint is available through the `/improvement_suggestion` endpoint.
+All memory and reasoning context flows through `hipcortex_bridge.py`.  The
+`build_test_cycle` function encapsulates the round‑trip from code generation to
+testing and reflexion.
+
+The frontend polls `/test_results` and `/improvement_suggestion` to provide live
+feedback during the build process.

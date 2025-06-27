@@ -1,7 +1,29 @@
 # Codex Booster
 
-This repository contains the scaffolding for **Codex Booster**, an AI-native platform that orchestrates multiple agents to convert user goals into working software. The implementation integrates with **HipCortex** for all memory and reflexion functionality. See `docs/README.md` for an overview of the architecture and development roadmap.
+Codex Booster is an AI‑native platform that turns natural language goals into
+working software.  A set of specialised agents handle planning, code
+generation, testing, reflexion and billing.  All reasoning state is recorded in
+**HipCortex**, enabling a persistent memory of each build attempt.
 
-## Frontend
+## Quickstart
 
-The `frontend` directory contains a minimal Next.js application with pages for the landing site, pricing, dashboard, and contact information. The dashboard integrates with the FastAPI backend and demonstrates Clerk authentication and Stripe billing via the `/charge` endpoint.
+### Backend
+
+1. Install dependencies with `pip install -r requirements.txt`.
+2. Run the API using `uvicorn backend.main:app --reload`.
+3. Visit `/docs` for interactive API documentation.
+
+### Frontend
+
+1. `cd frontend`
+2. Install dependencies via `npm install`.
+3. Start the dev server using `npm run dev`.
+
+## Tests
+
+Execute Python tests with `pytest` and frontend tests with `npm test`.
+
+## Documentation
+
+Architecture diagrams, design notes and the development roadmap are kept in
+`docs/`.  Start with [docs/README.md](docs/README.md) for an overview.
