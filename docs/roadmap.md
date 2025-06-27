@@ -1,5 +1,6 @@
 # Roadmap
 
-1. **MVP**: Basic FastAPI app, agent scaffolding, HipCortex integration.
-2. **Beta**: Add Next.js frontend, authentication, billing with Stripe.
-3. **Pro/Enterprise**: Advanced monetization, deployment automation, and enhanced agent reflexion.
+1. **Alpha** – Backend agents with HipCortex hooks and test-driven workflow.
+2. **Beta** – Next.js frontend, Clerk authentication and basic Stripe billing.
+3. **Pro** – Rich reflexion features, plugin ecosystem and automated deployments.
+4. **Enterprise** – Team-based memory isolation, white labelling and advanced quota management.
