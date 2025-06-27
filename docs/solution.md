@@ -15,5 +15,9 @@ All memory and reasoning context flows through `hipcortex_bridge.py`.  The
 `build_test_cycle` function encapsulates the round‑trip from code generation to
 testing and reflexion.
 
+Each step is logged to HipCortex so that the AUREUS reflexion loop can analyse
+failures and propose new builder instructions. This chain‑of‑thought history is
+available in the dashboard via the *ReasoningPanel* component.
+
 The frontend polls `/test_results` and `/improvement_suggestion` to provide live
 feedback during the build process.
