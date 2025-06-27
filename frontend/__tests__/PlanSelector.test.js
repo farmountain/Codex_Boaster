@@ -1,7 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import PlanSelector from '../components/PlanSelector';
+import '@testing-library/jest-dom';
+import PlanSelector from '../components/PlanSelector.jsx';
 
-(global as any).fetch = jest.fn(() =>
+global.fetch = jest.fn(() =>
   Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
 );
 
