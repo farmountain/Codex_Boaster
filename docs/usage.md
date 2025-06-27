@@ -1,7 +1,14 @@
 # Usage Guide
 
 This short guide explains how to try Codex Booster locally. The platform exposes
-an API powered by FastAPI and a small Next.js interface.
+an API powered by FastAPI and a small Next.js interface. The dashboard
+presents **Plan**, **Build**, **Test** and **Deploy** actions that drive the
+agent workflow.
+
+Example prompts:
+
+- *"Build an AI planner with Stripe billing"* – triggers the Planner and Repo‑Init agents.
+- *"Deploy latest build"* – calls the Deploy agent to provision a preview environment.
 
 ## Backend
 

@@ -5,6 +5,18 @@ working software.  A set of specialised agents handle planning, code
 generation, testing, reflexion and billing.  All reasoning state is recorded in
 **HipCortex**, enabling a persistent memory of each build attempt.
 
+### Key Features
+
+- **Architect, Builder and Tester agents** follow a test-first workflow.
+- **ReflexionAgent** refines instructions using the AUREUS framework.
+- **Config, Repo‑Init and Deploy agents** automate environment setup and
+  deployment.
+- **Integration and Test‑Suite agents** connect external APIs and generate SIT
+  / UAT flows.
+- **Doc and Chat agents** create docs and expose reasoning traces in the
+  dashboard.
+
+
 ## Quickstart
 
 ### Backend
@@ -34,4 +46,5 @@ cd frontend && npm test --silent && cd ..
 
 Architecture diagrams, design notes and the development roadmap are kept in
 `docs/`. Start with [docs/README.md](docs/README.md) for an overview and see
-[docs/usage.md](docs/usage.md) for a step-by-step usage guide.
+[docs/usage.md](docs/usage.md) for a step-by-step usage guide. The
+[Use Cases](docs/use_cases.md) page lists example prompts by value stream.
