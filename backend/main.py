@@ -1,6 +1,9 @@
 """FastAPI application entry point for Codex Booster."""
 
-from fastapi import FastAPI, APIRouter
+import os
+
+from fastapi import FastAPI, APIRouter, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 import tempfile
@@ -15,6 +18,13 @@ from backend.agents.monetizer_agent import MonetizerAgent
 from backend.services.workflow import build_test_cycle
 
 app = FastAPI(title="Codex Booster")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Routers for each agent
 architect_router = APIRouter(prefix="/architect", tags=["architect"])
@@ -31,13 +41,37 @@ app.include_router(reflexion_router)
 app.include_router(exporter_router)
 app.include_router(monetizer_router)
 
-hipcortex = HipCortexBridge(base_url="http://hipcortex")
+hipcortex = HipCortexBridge(base_url=os.getenv("HIPCORTEX_URL", "http://hipcortex"))
 architect_agent = ArchitectAgent(hipcortex)
 builder_agent = BuilderAgent(hipcortex)
 tester_agent = TesterAgent(hipcortex)
 reflexion_agent = ReflexionAgent(hipcortex)
 exporter_agent = ExporterAgent(hipcortex)
-monetizer_agent = MonetizerAgent(hipcortex, api_key="sk_test")
+monetizer_agent = MonetizerAgent(hipcortex)
+
+
+def get_architect_agent() -> ArchitectAgent:
+    return architect_agent
+
+
+def get_builder_agent() -> BuilderAgent:
+    return builder_agent
+
+
+def get_tester_agent() -> TesterAgent:
+    return tester_agent
+
+
+def get_reflexion_agent() -> ReflexionAgent:
+    return reflexion_agent
+
+
+def get_exporter_agent() -> ExporterAgent:
+    return exporter_agent
+
+
+def get_monetizer_agent() -> MonetizerAgent:
+    return monetizer_agent
 
 # in-memory store for latest test results
 latest_test_results = {"success": None, "output": ""}
@@ -73,63 +107,119 @@ async def root():
     return {"message": "Codex Booster API"}
 
 
+@app.post("/plan")
+async def plan_root(req: PlanRequest, agent: ArchitectAgent = Depends(get_architect_agent)):
+    return agent.plan(req.goal)
+
+
+@app.post("/build")
+async def build_root(req: BuildRequest, agent: BuilderAgent = Depends(get_builder_agent)):
+    code = agent.build(req.tests)
+    return {"code": code}
+
+
+@app.post("/test")
+async def test_root(req: RunTestsRequest, agent: TesterAgent = Depends(get_tester_agent)):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        (tmp_path / "generated_module.py").write_text(req.code)
+        (tmp_path / "test_generated.py").write_text(req.tests)
+        success = agent.run_tests(tmpdir)
+    return {"success": success, "output": agent.last_output}
+
+
+@app.post("/reflect")
+async def reflect_root(req: ReflexRequest, agent: ReflexionAgent = Depends(get_reflexion_agent)):
+    instructions = agent.reflect(req.feedback)
+    return {"instructions": instructions}
+
+
+@app.post("/export")
+async def export_root(req: ExportRequest, agent: ExporterAgent = Depends(get_exporter_agent)):
+    archive = agent.export(req.path)
+    return {"archive": archive}
+
+
+@app.post("/charge")
+async def charge_root(req: ChargeRequest, agent: MonetizerAgent = Depends(get_monetizer_agent)):
+    agent.charge(req.user_id, req.amount)
+    return {"status": "charged"}
+
+
 @architect_router.post("/plan")
-async def plan_architecture(req: PlanRequest):
+async def plan_architecture(
+    req: PlanRequest, agent: ArchitectAgent = Depends(get_architect_agent)
+):
     """Return an architecture plan for the provided goal."""
-    return architect_agent.plan(req.goal)
+    return agent.plan(req.goal)
 
 
 @builder_router.post("/build")
-async def build(req: BuildRequest):
+async def build(
+    req: BuildRequest, agent: BuilderAgent = Depends(get_builder_agent)
+):
     """Generate code from tests."""
-    code = builder_agent.build(req.tests)
+    code = agent.build(req.tests)
     return {"code": code}
 
 
 @builder_router.post("/build_and_test")
-async def build_and_test(req: BuildRequest):
+async def build_and_test(
+    req: BuildRequest,
+    builder: BuilderAgent = Depends(get_builder_agent),
+    tester: TesterAgent = Depends(get_tester_agent),
+    reflexion: ReflexionAgent = Depends(get_reflexion_agent),
+):
     """Generate code from tests and run them."""
     success, code = build_test_cycle(
-        req.tests, builder_agent, tester_agent, reflexion_agent
+        req.tests, builder, tester, reflexion
     )
 
     latest_test_results["success"] = success
     if not success:
-        latest_improvement["suggestion"] = builder_agent.instructions
+        latest_improvement["suggestion"] = builder.instructions
     else:
         latest_improvement["suggestion"] = ""
     return {"code": code, "success": success}
 
 
 @tester_router.post("/run")
-async def run_tests(req: RunTestsRequest):
+async def run_tests(
+    req: RunTestsRequest, agent: TesterAgent = Depends(get_tester_agent)
+):
     """Run tests against provided code."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
         (tmp_path / "generated_module.py").write_text(req.code)
         (tmp_path / "test_generated.py").write_text(req.tests)
-        success = tester_agent.run_tests(tmpdir)
-    return {"success": success, "output": tester_agent.last_output}
+        success = agent.run_tests(tmpdir)
+    return {"success": success, "output": agent.last_output}
 
 
 @reflexion_router.post("/reflect")
-async def reflect(req: ReflexRequest):
+async def reflect(
+    req: ReflexRequest, agent: ReflexionAgent = Depends(get_reflexion_agent)
+):
     """Provide reflexion feedback."""
-    instructions = reflexion_agent.reflect(req.feedback)
+    instructions = agent.reflect(req.feedback)
     return {"instructions": instructions}
 
 
 @exporter_router.post("/export")
-async def export(req: ExportRequest):
+async def export(
+    req: ExportRequest, agent: ExporterAgent = Depends(get_exporter_agent)
+):
     """Export an artifact and return archive path."""
-    archive = exporter_agent.export(req.path)
+    archive = agent.export(req.path)
     return {"archive": archive}
 
 
 @monetizer_router.post("/charge")
-async def charge(req: ChargeRequest):
+async def charge(
+    req: ChargeRequest, agent: MonetizerAgent = Depends(get_monetizer_agent)
+):
     """Charge the user for usage."""
-    monetizer_agent.charge(req.user_id, req.amount)
+    agent.charge(req.user_id, req.amount)
     return {"status": "charged"}
 
 
