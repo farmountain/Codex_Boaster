@@ -12,3 +12,12 @@ def test_plan_endpoint():
     data = resp.json()
     assert data['goal'] == 'demo goal'
     assert 'modules' in data
+
+
+def test_plan_root_endpoint():
+    client = TestClient(app)
+    resp = client.post('/plan', json={'goal': 'demo goal'})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data['goal'] == 'demo goal'
+    assert 'modules' in data

@@ -1,5 +1,7 @@
 """MonetizerAgent integrates billing via Stripe."""
 
+import os
+
 from .base import BaseAgent
 from backend.integrations.hipcortex_bridge import HipCortexBridge
 import stripe
@@ -7,8 +9,10 @@ import stripe
 class MonetizerAgent(BaseAgent):
     """Handles usage-based monetization."""
 
-    def __init__(self, hipcortex: HipCortexBridge, api_key: str) -> None:
+    def __init__(self, hipcortex: HipCortexBridge, api_key: str | None = None) -> None:
         self.hipcortex = hipcortex
+        if api_key is None:
+            api_key = os.getenv("STRIPE_API_KEY", "")
         stripe.api_key = api_key
 
     def charge(self, user_id: str, amount: int) -> None:
