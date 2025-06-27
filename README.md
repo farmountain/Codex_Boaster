@@ -16,6 +16,8 @@ generation, testing, reflexion and billing.  All reasoning state is recorded in
 - **Doc and Chat agents** create docs and expose reasoning traces in the
   dashboard.
 
+- **Marketplace** lists MCP servers, LLM adapters and database connectors for easy integration
+
 
 ## Quickstart
 
@@ -47,4 +49,10 @@ cd frontend && npm test --silent && cd ..
 Architecture diagrams, design notes and the development roadmap are kept in
 `docs/`. Start with [docs/README.md](docs/README.md) for an overview and see
 [docs/usage.md](docs/usage.md) for a step-by-step usage guide. The
+
+[Use Cases](docs/use_cases.md) page lists example prompts by value stream. See
+[Marketplace Guide](docs/marketplace.md) if you want to contribute your own
+connectors.
+
 [Use Cases](docs/use_cases.md) page lists example prompts by value stream.
+

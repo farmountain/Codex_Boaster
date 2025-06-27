@@ -14,5 +14,7 @@ Codex Booster automates the full software development lifecycle. The table below
 | **Document** | `Doc-Agent` writes usage instructions and inline docs. | "Generate README for the repo" |
 | **Chat / Improve** | `Chat-Agent` presents reasoning traces and accepts user feedback. | Interact in dashboard chat |
 | **Monetize** | `MonetizerAgent` records usage and charges through Stripe. | automatic |
+| **Marketplace** | `Marketplace Service` lists external connectors and tools. | "Show available LLM adapters" |
+
 
 These activities combine to deliver an autonomous build-test-deploy cycle with persistent memory via HipCortex.

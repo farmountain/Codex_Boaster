@@ -26,6 +26,9 @@ Additional helper modules are planned for configuration and deployment:
 - **Integration Agent** – detects API/SDK usage and wires credentials.
 - **Test‑Suite Agent** – produces SIT/UAT scripts on top of unit tests.
 
+- **Marketplace Service** – exposes external components (MCP servers, LLM adapters, database connectors).
+
+
 Each agent has a dedicated router so the API can be consumed individually or
 via the `/builder/build_and_test` endpoint which drives the full build/test
 cycle. The frontend Dashboard component calls these endpoints and displays the

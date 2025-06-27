@@ -9,6 +9,8 @@ Example prompts:
 
 - *"Build an AI planner with Stripe billing"* – triggers the Planner and Repo‑Init agents.
 - *"Deploy latest build"* – calls the Deploy agent to provision a preview environment.
+- *"Show marketplace components"* – lists available MCP servers and LLM adapters.
+
 
 ## Backend
 
