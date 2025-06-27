@@ -1,7 +1,7 @@
 module.exports = {
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }]
+    '^.+\\.[jt]sx?$': 'babel-jest'
   },
   moduleNameMapper: {
     '\\.(css|less)$': 'identity-obj-proxy'
