@@ -23,7 +23,15 @@ generation, testing, reflexion and billing.  All reasoning state is recorded in
 
 Execute Python tests with `pytest` and frontend tests with `npm test`.
 
+To run all tests, including the UI components, execute:
+```bash
+pytest
+npm test --silent
+cd frontend && npm test --silent && cd ..
+```
+
 ## Documentation
 
 Architecture diagrams, design notes and the development roadmap are kept in
-`docs/`.  Start with [docs/README.md](docs/README.md) for an overview.
+`docs/`. Start with [docs/README.md](docs/README.md) for an overview and see
+[docs/usage.md](docs/usage.md) for a step-by-step usage guide.
