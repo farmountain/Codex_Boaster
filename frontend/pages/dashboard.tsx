@@ -3,6 +3,8 @@ import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import CodeEditor from '../components/CodeEditor';
 import ReasoningPanel from '../components/ReasoningPanel';
 import UsageMeter from '../components/UsageMeter';
+import TestMatrix from '../components/TestMatrix';
+import TestResultPanel from '../components/TestResultPanel';
 
 export default function Dashboard() {
   const [tests, setTests] = useState('');
@@ -11,6 +13,7 @@ export default function Dashboard() {
   const [prompt, setPrompt] = useState('');
   const [plan, setPlan] = useState([]);
   const [reasoning, setReasoning] = useState('');
+  const [testResult, setTestResult] = useState({});
 
   async function handlePlanSubmit() {
     const res = await fetch('/api/architect', {
@@ -33,14 +36,14 @@ export default function Dashboard() {
     setCode(data.code);
   }
 
-  async function run() {
-    const res = await fetch('http://localhost:8000/test', {
+  async function runTest() {
+    const res = await fetch('/api/run-tests', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, tests })
+      body: JSON.stringify({ runtime: 'python' }),
+      headers: { 'Content-Type': 'application/json' }
     });
     const data = await res.json();
-    setOutput(data.output || '');
+    setTestResult(data);
   }
 
   return (
@@ -59,7 +62,7 @@ export default function Dashboard() {
         />
         <button onClick={handlePlanSubmit}>Plan</button>
         <button onClick={build}>Build</button>
-        <button onClick={run}>Test</button>
+        <button onClick={runTest}>Run Tests</button>
         <div style={{ marginTop: '1rem' }}>
           <CodeEditor code={code} onChange={setCode} />
         </div>
@@ -71,6 +74,9 @@ export default function Dashboard() {
         />
         <pre>{output}</pre>
         <ReasoningPanel reasoning={reasoning} plan={plan} />
+        {typeof testResult.success !== 'undefined' && (
+          <TestResultPanel stdout={testResult.stdout} stderr={testResult.stderr} />
+        )}
       </SignedIn>
     </div>
   );
