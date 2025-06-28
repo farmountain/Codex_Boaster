@@ -18,6 +18,7 @@ from backend.agents.monetizer_agent import MonetizerAgent
 from backend.services.workflow import build_test_cycle
 from backend.services.marketplace import list_components
 from backend.architect_agent import router as project_plan_router
+from backend.config_agent import router as config_router
 
 app = FastAPI(title="Codex Booster")
 app.add_middleware(
@@ -45,6 +46,7 @@ app.include_router(exporter_router)
 app.include_router(monetizer_router)
 app.include_router(marketplace_router)
 app.include_router(project_plan_router)
+app.include_router(config_router)
 
 hipcortex = HipCortexBridge(base_url=os.getenv("HIPCORTEX_URL", "http://hipcortex"))
 architect_agent = ArchitectAgent(hipcortex)

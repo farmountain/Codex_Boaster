@@ -31,3 +31,14 @@ def store_plan_snapshot(prompt: str, modules: list, trace: str) -> str:
     snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
     bridge.log_event({"agent": "architect", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
     return snapshot_id
+
+def store_env_snapshot(data: dict) -> str:
+    """Persist environment configuration snapshot."""
+    snapshot = {
+        "type": "env_config",
+        "data": data,
+        "timestamp": get_current_timestamp(),
+    }
+    snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
+    bridge.log_event({"agent": "config", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
+    return snapshot_id
