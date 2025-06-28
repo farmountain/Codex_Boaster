@@ -6,3 +6,10 @@
 4. **Enterprise** – Team-based memory isolation, plugin ecosystem and advanced quota management.
 5. **Marketplace** – External vendors submit MCP servers, LLM adapters and database connectors. Security and performance guidelines ensure safe deployment.
 6. **Full UI/UX** – Sidebar project switcher, agent chat panel, terminal access and workspace list with runtime badges.
+
+## Future Extensions
+
+- Auto-detect language from project structure
+- Inline validation of secrets (OPENAI_KEY format)
+- Save and reuse previous snapshots from HipCortex memory
+- Link config with project IDs in Supabase
