@@ -54,6 +54,10 @@ Run common setup commands directly from the dashboard.  Open the
 execute commands such as `npm install` or `pytest`.  Logs are streamed
 in real time and saved under `logs/runtime/` for later review.
 
+### Runtime Configuration
+
+Use the **Runtime Selector** and **EnvVarForm** components to choose your Python, Node or Go versions and enter any required environment variables. Saving this form writes `.env`, `.env.template.json`, `docker-compose.yml` and `codexbooster.config.json` for repeatable setups.
+
 ## Tests
 
 Execute Python tests with `pytest` and frontend tests with `npm test`.

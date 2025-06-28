@@ -7,6 +7,7 @@
 4. **Enterprise** – Team-based memory isolation, plugin ecosystem and advanced quota management.
 5. **Marketplace** – External vendors submit MCP servers, LLM adapters and database connectors. Security and performance guidelines ensure safe deployment.
 6. **Full UI/UX** – Sidebar project switcher, agent chat panel, terminal access and workspace list with runtime badges.
+7. **ConfigAgent backend implementation complete (v0.1 milestone)**
 
 ## Future Extensions
 
