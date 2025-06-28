@@ -2,7 +2,11 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from .llm_client import generate_improvement_suggestions
-from .hipcortex_bridge import log_event, store_reflexion_snapshot
+from .hipcortex_bridge import (
+    log_event,
+    store_reflexion_snapshot,
+    get_reflexion_logs,
+)
 
 router = APIRouter()
 
@@ -25,3 +29,9 @@ async def reflect(req: ReflexionRequest):
         "confidence": plan.get("confidence", "N/A") if isinstance(plan, dict) else "N/A"
     })
     return {"plan": plan, "snapshot_id": snapshot_id}
+
+
+@router.get("/reflexion/logs")
+def fetch_reflexion_logs():
+    logs = get_reflexion_logs()
+    return logs

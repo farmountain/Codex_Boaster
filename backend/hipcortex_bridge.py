@@ -139,3 +139,22 @@ def store_chat_snapshot(session_data):
     bridge.log_event({"agent": "chat", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
     return snapshot_id
 
+
+def get_reflexion_logs():
+    """Simulate fetching all reflexion memory traces and scores."""
+    return [
+        {
+            "timestamp": "2025-06-27T12:34:56",
+            "agent": "ReflexionAgent",
+            "confidence": 0.62,
+            "suggestion": "Re-structure the loop for better modularity.",
+            "log": "Failure in step 3 \u2192 BuilderAgent mismatch",
+        },
+        {
+            "timestamp": "2025-06-27T12:32:22",
+            "agent": "ReflexionAgent",
+            "confidence": 0.91,
+            "suggestion": "\u2705 Passed all tests. No change needed.",
+            "log": "TestRefactor completed \u2192 Code stable.",
+        },
+    ]

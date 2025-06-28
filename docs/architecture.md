@@ -21,7 +21,9 @@ Panel** for conversational commands and a real‑time workspace list.  Each
 project stores its runtime configuration (Python, Node, Rust, etc.) and secrets
 in HipCortex so that the agents always operate with the latest context.  Test
 results, confidence scores and retry history are displayed in the Reflexion
-panel alongside a HipCortex memory timeline.
+panel alongside a HipCortex memory timeline. The panel fetches `/reflexion/logs`
+from the API which returns the agent's chain-of-thought traces and confidence
+metrics.
 
 Additional helper modules are planned for configuration and deployment:
 

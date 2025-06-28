@@ -8,8 +8,10 @@ generation, testing, reflexion and billing.  All reasoning state is recorded in
 The current UI is organised around a sidebar project switcher, an **Agent
 Panel** for chat-driven workflows and a modular workspace that lists active
 repositories.  Users select language runtimes such as Python, Node or Rust
-and configure secrets directly in the browser.  Logs and agent confidence
-scores appear in the **Reflexion** panel so you can inspect every decision.
+ and configure secrets directly in the browser.  Logs and agent confidence
+ scores appear in the **Reflexion** panel so you can inspect every decision.
+ The panel now lists a chronological history of each reflexion attempt with
+ colour-coded confidence scores.
 
 ### Key Features
 
