@@ -11,8 +11,7 @@ export default function Dashboard() {
   const [code, setCode] = useState('');
   const [output, setOutput] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [plan, setPlan] = useState([]);
-  const [reasoning, setReasoning] = useState('');
+  const [plan, setPlan] = useState({ steps: [] });
   const [testResult, setTestResult] = useState({});
 
   async function handlePlanSubmit() {
@@ -22,8 +21,7 @@ export default function Dashboard() {
       body: JSON.stringify({ prompt })
     });
     const data = await res.json();
-    setPlan(data.modules);
-    setReasoning(data.reasoning);
+    setPlan({ steps: data.modules || [] });
   }
 
   async function build() {
@@ -73,7 +71,7 @@ export default function Dashboard() {
           placeholder="Write tests here"
         />
         <pre>{output}</pre>
-        <ReasoningPanel reasoning={reasoning} plan={plan} />
+        <ReasoningPanel plan={plan} />
         {typeof testResult.success !== 'undefined' && (
           <TestResultPanel stdout={testResult.stdout} stderr={testResult.stderr} />
         )}

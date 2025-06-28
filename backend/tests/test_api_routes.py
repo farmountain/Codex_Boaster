@@ -78,6 +78,15 @@ def test_reflexion_root_route():
     assert "instructions" in resp.json()
 
 
+def test_new_reflexion_endpoint():
+    client = TestClient(app)
+    payload = {"test_log": "err", "code_snippet": "x", "context": {}}
+    resp = client.post("/reflexion", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "plan" in data and "snapshot_id" in data
+
+
 def test_exporter_route(tmp_path):
     client = TestClient(app)
     src = tmp_path / "src"

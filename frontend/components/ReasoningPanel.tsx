@@ -1,16 +1,15 @@
-export default function ReasoningPanel({ reasoning, plan }) {
+export default function ReasoningPanel({ plan }) {
   return (
-    <div className="p-4 bg-white rounded shadow mb-4">
-      <h2 className="text-xl font-bold">🧠 Agent Reasoning</h2>
-      <pre className="whitespace-pre-wrap text-gray-700">{reasoning}</pre>
-      <h3 className="text-lg font-semibold mt-4">📦 Modules Planned</h3>
-      <ul className="list-disc ml-6">
-        {plan.map((mod, idx) => (
-          <li key={idx} className="py-1">
-            <strong>{mod.name}</strong> – {mod.description}
-          </li>
-        ))}
-      </ul>
+    <div className="p-4 bg-white shadow rounded">
+      <h2 className="text-xl font-bold mb-4">🔁 Reflexion Plan</h2>
+      {plan.steps.map((step, i) => (
+        <div key={i} className="mb-2">
+          <p><strong>Step {i + 1}:</strong> {step.step}</p>
+          <p className="text-sm italic text-gray-600">Why: {step.why}</p>
+          <p className="text-green-700 font-mono mt-1">Fix: {step.fix}</p>
+          <p className="text-xs text-gray-500">Confidence: {step.confidence}/10</p>
+        </div>
+      ))}
     </div>
   );
 }
