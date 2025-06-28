@@ -90,3 +90,15 @@ def store_reflexion_snapshot(req, plan) -> str:
     snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
     bridge.log_event({"agent": "reflexion", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
     return snapshot_id
+
+
+def store_deploy_snapshot(result: dict) -> str:
+    """Persist deployment result and return snapshot id."""
+    snapshot = {
+        "type": "deployment",
+        "result": result,
+        "timestamp": get_current_timestamp(),
+    }
+    snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
+    bridge.log_event({"agent": "deploy", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
+    return snapshot_id
