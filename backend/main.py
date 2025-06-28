@@ -20,6 +20,7 @@ from backend.services.marketplace import list_components
 from backend.architect_agent import router as project_plan_router
 from backend.config_agent import router as config_router
 from backend.repo_init_agent import router as repo_init_router
+from backend.builder_agent import router as code_builder_router
 
 app = FastAPI(title="Codex Booster")
 app.add_middleware(
@@ -38,17 +39,6 @@ reflexion_router = APIRouter(prefix="/reflexion", tags=["reflexion"])
 exporter_router = APIRouter(prefix="/exporter", tags=["exporter"])
 monetizer_router = APIRouter(prefix="/monetizer", tags=["monetizer"])
 marketplace_router = APIRouter(prefix="/marketplace", tags=["marketplace"])
-
-app.include_router(architect_router)
-app.include_router(builder_router)
-app.include_router(tester_router)
-app.include_router(reflexion_router)
-app.include_router(exporter_router)
-app.include_router(monetizer_router)
-app.include_router(marketplace_router)
-app.include_router(project_plan_router)
-app.include_router(config_router)
-app.include_router(repo_init_router)
 
 hipcortex = HipCortexBridge(base_url=os.getenv("HIPCORTEX_URL", "http://hipcortex"))
 architect_agent = ArchitectAgent(hipcortex)
@@ -248,3 +238,16 @@ async def get_improvement_suggestion():
 async def marketplace_list():
     """List available marketplace components."""
     return {"components": list_components()}
+
+
+app.include_router(architect_router)
+app.include_router(builder_router)
+app.include_router(tester_router)
+app.include_router(reflexion_router)
+app.include_router(exporter_router)
+app.include_router(monetizer_router)
+app.include_router(marketplace_router)
+app.include_router(project_plan_router)
+app.include_router(config_router)
+app.include_router(repo_init_router)
+app.include_router(code_builder_router)

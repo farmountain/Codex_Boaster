@@ -54,3 +54,15 @@ def store_repo_snapshot(repo_name: str, files: dict) -> str:
     snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
     bridge.log_event({"agent": "repo_init", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
     return snapshot_id
+
+
+def store_code_snapshot(files: list) -> str:
+    """Persist generated code snapshot and return its id."""
+    snapshot = {
+        "type": "generated_code",
+        "files": files,
+        "timestamp": get_current_timestamp(),
+    }
+    snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
+    bridge.log_event({"agent": "builder", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
+    return snapshot_id
