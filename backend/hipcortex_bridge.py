@@ -42,3 +42,15 @@ def store_env_snapshot(data: dict) -> str:
     snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
     bridge.log_event({"agent": "config", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
     return snapshot_id
+
+def store_repo_snapshot(repo_name: str, files: dict) -> str:
+    """Persist repository initialization snapshot."""
+    snapshot = {
+        "type": "repo_init",
+        "repo": repo_name,
+        "files": list(files.keys()),
+        "timestamp": get_current_timestamp(),
+    }
+    snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
+    bridge.log_event({"agent": "repo_init", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
+    return snapshot_id
