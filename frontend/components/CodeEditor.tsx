@@ -1,17 +1,15 @@
-import Editor from '@monaco-editor/react';
+import MonacoEditor from "@monaco-editor/react";
 
-interface Props {
-  code: string;
-  onChange(value: string): void;
-}
-
-export default function CodeEditor({ code, onChange }: Props) {
+export default function CodeEditor({ code, onChange }) {
   return (
-    <Editor
-      height="400px"
-      language="python"
-      value={code}
-      onChange={(value) => onChange(value || '')}
-    />
+    <div className="h-96 border rounded shadow">
+      <MonacoEditor
+        height="100%"
+        defaultLanguage="python"
+        value={code}
+        onChange={onChange}
+        theme="vs-dark"
+      />
+    </div>
   );
 }
