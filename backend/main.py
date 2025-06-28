@@ -25,6 +25,7 @@ from backend.tester_agent import router as run_test_router
 from backend.test_suite_agent import router as test_suite_router
 from backend.deploy_agent import router as deploy_router
 from backend.reflexion_agent import router as improvement_router
+from backend.doc_agent import router as doc_router
 
 app = FastAPI(title="Codex Booster")
 app.add_middleware(
@@ -251,6 +252,7 @@ app.include_router(reflexion_router)
 app.include_router(exporter_router)
 app.include_router(monetizer_router)
 app.include_router(marketplace_router)
+app.include_router(doc_router)
 app.include_router(improvement_router)
 app.include_router(project_plan_router)
 app.include_router(config_router)

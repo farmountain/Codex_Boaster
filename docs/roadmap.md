@@ -19,3 +19,6 @@
 - Extend to include GitHub Actions deploy via CI token
 - Automatically infer deploy targets from config_agent + runtime metadata
 - Store and replay deploy snapshots in the memory explorer UI
+- Trigger DocAgent automatically after a successful build-test loop
+- Enable DocAgent to summarize GitHub README + architecture for external repos
+- Connect to ChatAgent → "Generate summary of this repo’s architecture"
