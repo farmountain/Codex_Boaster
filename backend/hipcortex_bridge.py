@@ -102,3 +102,16 @@ def store_deploy_snapshot(result: dict) -> str:
     snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
     bridge.log_event({"agent": "deploy", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
     return snapshot_id
+
+
+def store_doc_snapshot(files: dict, documentation) -> str:
+    """Persist generated documentation and return snapshot id."""
+    snapshot = {
+        "type": "documentation",
+        "files": list(files.keys()),
+        "docs": documentation,
+        "timestamp": get_current_timestamp(),
+    }
+    snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
+    bridge.log_event({"agent": "docs", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
+    return snapshot_id

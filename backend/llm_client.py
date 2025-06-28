@@ -1,3 +1,6 @@
+from typing import Dict
+
+
 def call_ollama_or_openai(prompt: str) -> str:
     """Placeholder LLM call for tests."""
     # In a real implementation this would call Ollama or OpenAI APIs.
@@ -39,6 +42,33 @@ Respond in JSON:
     {{ "step": "...", "why": "...", "fix": "...", "confidence": 8 }},
     ...
   ]
+}}
+"""
+    return call_ollama_or_openai(prompt)
+
+
+def generate_docs(files: Dict[str, str], context: Dict):
+    prompt = f"""
+You are a technical writer agent.
+
+Given the following code files and context from memory (tests, plan, config), generate:
+- 📘 README.md with setup, features, and modules
+- 🧠 architecture.md with system design
+- ⚙️ api.md with endpoint details
+- 🧪 tests.md with coverage explanation
+
+Files:
+{list(files.keys())}
+
+Code + Context:
+{str(context)[:4000]}
+
+Respond as JSON:
+{{
+  "README.md": "...",
+  "architecture.md": "...",
+  "api.md": "...",
+  "tests.md": "..."
 }}
 """
     return call_ollama_or_openai(prompt)
