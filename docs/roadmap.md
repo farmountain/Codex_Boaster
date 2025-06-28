@@ -25,3 +25,7 @@
 - Enable voice chat via Whisper API for audio input
 - Store all chats as snapshots and link to DocAgent for auto-generated CONVERSATIONS.md
 - Let ChatAgent orchestrate a Reflexion → Test → Rebuild loop as a command proxy
+- Extend monetization to API usage billing (e.g., Ollama, RAG)
+- Offer enterprise licensing keys and team plan administration
+- Generate an automated plan usage dashboard (UsageMeter.tsx)
+- Once deployed, this completes the business model loop — from value delivery to value capture. Ready to move to agent permissioning next
