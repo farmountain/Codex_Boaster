@@ -15,6 +15,7 @@ from backend.agents.tester_agent import TesterAgent
 from backend.agents.reflexion_agent import ReflexionAgent
 from backend.agents.exporter_agent import ExporterAgent
 from backend.agents.monetizer_agent import MonetizerAgent
+from backend.monetizer_agent import router as payment_router
 from backend.services.workflow import build_test_cycle
 from backend.services.marketplace import list_components
 from backend.architect_agent import router as project_plan_router
@@ -78,9 +79,11 @@ def get_exporter_agent() -> ExporterAgent:
 def get_monetizer_agent() -> MonetizerAgent:
     return monetizer_agent
 
+
 # in-memory store for latest test results
 latest_test_results = {"success": None, "output": ""}
 latest_improvement = {"suggestion": ""}
+
 
 class PlanRequest(BaseModel):
     goal: str
@@ -107,24 +110,31 @@ class ChargeRequest(BaseModel):
     user_id: str
     amount: int
 
+
 @app.get("/")
 async def root():
     return {"message": "Codex Booster API"}
 
 
 @app.post("/plan")
-async def plan_root(req: PlanRequest, agent: ArchitectAgent = Depends(get_architect_agent)):
+async def plan_root(
+    req: PlanRequest, agent: ArchitectAgent = Depends(get_architect_agent)
+):
     return agent.plan(req.goal)
 
 
 @app.post("/build")
-async def build_root(req: BuildRequest, agent: BuilderAgent = Depends(get_builder_agent)):
+async def build_root(
+    req: BuildRequest, agent: BuilderAgent = Depends(get_builder_agent)
+):
     code = agent.build(req.tests)
     return {"code": code}
 
 
 @app.post("/test")
-async def test_root(req: RunTestsRequest, agent: TesterAgent = Depends(get_tester_agent)):
+async def test_root(
+    req: RunTestsRequest, agent: TesterAgent = Depends(get_tester_agent)
+):
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
         (tmp_path / "generated_module.py").write_text(req.code)
@@ -134,21 +144,19 @@ async def test_root(req: RunTestsRequest, agent: TesterAgent = Depends(get_teste
 
 
 @app.post("/reflect")
-async def reflect_root(req: ReflexRequest, agent: ReflexionAgent = Depends(get_reflexion_agent)):
+async def reflect_root(
+    req: ReflexRequest, agent: ReflexionAgent = Depends(get_reflexion_agent)
+):
     instructions = agent.reflect(req.feedback)
     return {"instructions": instructions}
 
 
 @app.post("/export")
-async def export_root(req: ExportRequest, agent: ExporterAgent = Depends(get_exporter_agent)):
+async def export_root(
+    req: ExportRequest, agent: ExporterAgent = Depends(get_exporter_agent)
+):
     archive = agent.export(req.path)
     return {"archive": archive}
-
-
-@app.post("/charge")
-async def charge_root(req: ChargeRequest, agent: MonetizerAgent = Depends(get_monetizer_agent)):
-    agent.charge(req.user_id, req.amount)
-    return {"status": "charged"}
 
 
 @architect_router.post("/plan")
@@ -160,9 +168,7 @@ async def plan_architecture(
 
 
 @builder_router.post("/build")
-async def build(
-    req: BuildRequest, agent: BuilderAgent = Depends(get_builder_agent)
-):
+async def build(req: BuildRequest, agent: BuilderAgent = Depends(get_builder_agent)):
     """Generate code from tests."""
     code = agent.build(req.tests)
     return {"code": code}
@@ -176,9 +182,7 @@ async def build_and_test(
     reflexion: ReflexionAgent = Depends(get_reflexion_agent),
 ):
     """Generate code from tests and run them."""
-    success, code = build_test_cycle(
-        req.tests, builder, tester, reflexion
-    )
+    success, code = build_test_cycle(req.tests, builder, tester, reflexion)
 
     latest_test_results["success"] = success
     if not success:
@@ -251,6 +255,7 @@ app.include_router(builder_router)
 app.include_router(tester_router)
 app.include_router(reflexion_router)
 app.include_router(exporter_router)
+app.include_router(payment_router)
 app.include_router(monetizer_router)
 app.include_router(marketplace_router)
 app.include_router(doc_router)

@@ -1,4 +1,5 @@
 import pytest
+
 fastapi = pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient
 from backend.main import app
@@ -120,12 +121,28 @@ def test_monetizer_route(monkeypatch):
     assert resp.json()["status"] == "charged"
 
 
-def test_monetizer_root_route(monkeypatch):
-    monkeypatch.setattr(
-        "backend.agents.monetizer_agent.stripe.Charge.create", lambda **kw: None
+def test_checkout_route(monkeypatch):
+    class Session:
+        def __init__(self, url="http://checkout"):
+            self.url = url
+
+    import types
+    import backend.monetizer_agent as mod
+
+    checkout = types.SimpleNamespace(
+        Session=types.SimpleNamespace(create=lambda **kw: Session())
     )
-    monkeypatch.setenv("STRIPE_API_KEY", "sk_test")
+    monkeypatch.setattr(mod, "stripe", types.SimpleNamespace(checkout=checkout))
+    monkeypatch.setenv("STRIPE_SECRET_KEY", "sk")
+    monkeypatch.setenv("STRIPE_PRICE_STARTER", "price1")
+    monkeypatch.setenv("STRIPE_PRICE_PRO", "price2")
+    monkeypatch.setenv("STRIPE_PRICE_ENTERPRISE", "price3")
+    monkeypatch.setenv("FRONTEND_URL", "http://frontend")
+
     client = TestClient(app)
-    resp = client.post("/charge", json={"user_id": "cus_1", "amount": 100})
+    resp = client.post(
+        "/charge",
+        json={"user_id": "cus_1", "plan": "starter", "email": "a@b.com"},
+    )
     assert resp.status_code == 200
-    assert resp.json()["status"] == "charged"
+    assert resp.json()["checkout_url"] == "http://checkout"

@@ -1,37 +1,41 @@
 import { useState } from 'react';
 
-interface Plan {
-  id: string;
-  label: string;
-  amount: number;
-}
+export default function PlanSelector({ userId, email }) {
+  const [selected, setSelected] = useState('starter');
 
-const plans: Plan[] = [
-  { id: 'basic', label: 'Basic - $10', amount: 1000 },
-  { id: 'pro', label: 'Pro - $20', amount: 2000 },
-];
-
-export default function PlanSelector() {
-  const [selected, setSelected] = useState<Plan | null>(null);
-
-  async function checkout(plan: Plan) {
-    setSelected(plan);
-    await fetch('http://localhost:8000/charge', {
+  async function startCheckout() {
+    const res = await fetch('/api/charge', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: 'test', amount: plan.amount }),
+      body: JSON.stringify({ user_id: userId, plan: selected, email }),
+      headers: { 'Content-Type': 'application/json' }
     });
+    const data = await res.json();
+    if (data.checkout_url) window.location.href = data.checkout_url;
   }
 
   return (
-    <div>
-      <h2>Select Plan</h2>
-      {plans.map((p) => (
-        <button key={p.id} onClick={() => checkout(p)}>
-          {p.label}
-        </button>
-      ))}
-      {selected && <p>Selected {selected.label}</p>}
+    <div className="p-6 bg-white rounded shadow w-full max-w-md mx-auto">
+      <h2 className="text-2xl font-bold text-center mb-4">Choose Your Plan</h2>
+      <div className="space-y-3">
+        {['starter', 'pro', 'enterprise'].map(plan => (
+          <div key={plan} className={`p-4 border rounded ${selected === plan ? 'border-blue-600 bg-blue-50' : ''}`}>
+            <label className="flex items-center space-x-2">
+              <input type="radio" value={plan} name="plan" checked={selected === plan}
+                onChange={() => setSelected(plan)} />
+              <span className="capitalize font-semibold">{plan} Plan</span>
+            </label>
+            <p className="text-sm text-gray-600 mt-1">
+              {plan === 'starter' && 'Free limited access'}
+              {plan === 'pro' && 'Access to build/test/deploy loop + chat agent'}
+              {plan === 'enterprise' && 'Full agent suite + team sharing + API'}
+            </p>
+          </div>
+        ))}
+      </div>
+      <button onClick={startCheckout}
+        className="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+        Continue to Checkout
+      </button>
     </div>
   );
 }
