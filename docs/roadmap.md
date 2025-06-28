@@ -29,3 +29,6 @@
 - Offer enterprise licensing keys and team plan administration
 - Generate an automated plan usage dashboard (UsageMeter.tsx)
 - Once deployed, this completes the business model loop — from value delivery to value capture. Ready to move to agent permissioning next
+- Scaffold plugin.yaml schema and submission guide for contributors
+- Add marketplace integration logging into HipCortex for traceability
+- Extend UI to support plugin categories, search, and version filters
