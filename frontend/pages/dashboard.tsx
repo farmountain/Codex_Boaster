@@ -5,6 +5,7 @@ import ReasoningPanel from '../components/ReasoningPanel';
 import UsageMeter from '../components/UsageMeter';
 import TestMatrix from '../components/TestMatrix';
 import TestResultPanel from '../components/TestResultPanel';
+import ChatPanel from '../components/ChatPanel';
 
 export default function Dashboard() {
   const [tests, setTests] = useState('');
@@ -75,6 +76,7 @@ export default function Dashboard() {
         {typeof testResult.success !== 'undefined' && (
           <TestResultPanel stdout={testResult.stdout} stderr={testResult.stderr} />
         )}
+        <ChatPanel />
       </SignedIn>
     </div>
   );

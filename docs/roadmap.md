@@ -22,3 +22,6 @@
 - Trigger DocAgent automatically after a successful build-test loop
 - Enable DocAgent to summarize GitHub README + architecture for external repos
 - Connect to ChatAgent → "Generate summary of this repo’s architecture"
+- Enable voice chat via Whisper API for audio input
+- Store all chats as snapshots and link to DocAgent for auto-generated CONVERSATIONS.md
+- Let ChatAgent orchestrate a Reflexion → Test → Rebuild loop as a command proxy
