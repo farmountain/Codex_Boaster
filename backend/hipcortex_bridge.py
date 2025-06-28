@@ -77,3 +77,16 @@ def store_test_results(result: dict) -> str:
     snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
     bridge.log_event({"agent": "tester", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
     return snapshot_id
+
+
+def store_reflexion_snapshot(req, plan) -> str:
+    """Persist reflexion improvement plan and return snapshot id."""
+    snapshot = {
+        "type": "reflexion_trace",
+        "input": {"test_log": req.test_log, "code": req.code_snippet},
+        "plan": plan,
+        "timestamp": get_current_timestamp(),
+    }
+    snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
+    bridge.log_event({"agent": "reflexion", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
+    return snapshot_id
