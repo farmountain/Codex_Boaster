@@ -8,15 +8,19 @@ export default function Dashboard() {
   const [tests, setTests] = useState('');
   const [code, setCode] = useState('');
   const [output, setOutput] = useState('');
+  const [prompt, setPrompt] = useState('');
+  const [plan, setPlan] = useState([]);
+  const [reasoning, setReasoning] = useState('');
 
-  async function plan() {
-    const res = await fetch('http://localhost:8000/plan', {
+  async function handlePlanSubmit() {
+    const res = await fetch('/api/architect', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ goal: 'demo goal' })
+      body: JSON.stringify({ prompt })
     });
     const data = await res.json();
-    setOutput(JSON.stringify(data, null, 2));
+    setPlan(data.modules);
+    setReasoning(data.reasoning);
   }
 
   async function build() {
@@ -47,7 +51,13 @@ export default function Dashboard() {
       <SignedIn>
         <h1>Dashboard</h1>
         <UsageMeter />
-        <button onClick={plan}>Plan</button>
+        <input
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Project idea"
+          className="border p-1 mr-2"
+        />
+        <button onClick={handlePlanSubmit}>Plan</button>
         <button onClick={build}>Build</button>
         <button onClick={run}>Test</button>
         <div style={{ marginTop: '1rem' }}>
@@ -60,7 +70,7 @@ export default function Dashboard() {
           placeholder="Write tests here"
         />
         <pre>{output}</pre>
-        <ReasoningPanel />
+        <ReasoningPanel reasoning={reasoning} plan={plan} />
       </SignedIn>
     </div>
   );
