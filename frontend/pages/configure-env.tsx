@@ -4,7 +4,6 @@ import EnvVarForm from '../components/EnvVarForm';
 import SetupPreview from '../components/SetupPreview';
 
 export default function ConfigPage() {
-  const [runtimes, setRuntimes] = useState({});
   const [envVars, setEnvVars] = useState({});
   const [setupScript, setSetupScript] = useState([
     'npm install',
@@ -15,7 +14,6 @@ export default function ConfigPage() {
     await fetch('/api/configure-env', {
       method: 'POST',
       body: JSON.stringify({
-        runtimes,
         env_vars: envVars,
         setup_script: setupScript,
       }),
@@ -26,7 +24,7 @@ export default function ConfigPage() {
   return (
     <div className="p-4 space-y-4">
       <h1 className="text-xl font-bold">Configure Environment</h1>
-      <RuntimeSelector onChange={(lang, ver) => setRuntimes(prev => ({ ...prev, [lang]: ver }))} />
+      <RuntimeSelector />
       <EnvVarForm envVars={envVars} setEnvVars={setEnvVars} />
       <textarea
         className="border p-2 w-full"
