@@ -19,6 +19,17 @@ def log_event(agent: str, payload: dict) -> None:
     data = {"agent": agent, **payload}
     bridge.log_event(data)
 
+
+def set_runtime_context(runtime_dict):
+    """Record the active runtime configuration."""
+    log_event(
+        "ConfigAgent",
+        {
+            "type": "runtime_config",
+            "payload": runtime_dict,
+        },
+    )
+
 def store_plan_snapshot(prompt: str, modules: list, trace: str) -> str:
     """Persist a plan snapshot and return its id."""
     snapshot = {
