@@ -47,6 +47,13 @@ Additional UX highlights:
 2. Install dependencies via `npm install`.
 3. Start the dev server using `npm run dev`.
 
+### Terminal Runner
+
+Run common setup commands directly from the dashboard.  Open the
+**Configure Environment** page and use the embedded Terminal Runner to
+execute commands such as `npm install` or `pytest`.  Logs are streamed
+in real time and saved under `logs/runtime/` for later review.
+
 ## Tests
 
 Execute Python tests with `pytest` and frontend tests with `npm test`.

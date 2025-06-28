@@ -13,6 +13,7 @@
 - Auto-detect language from project structure
 - Inline validation of secrets (OPENAI_KEY format)
 - Save and reuse previous snapshots from HipCortex memory
+- Terminal runner service for runtime setup (in progress)
 - Link config with project IDs in Supabase
 - Add feedback loop from Reflexion to BuilderAgent (auto-patch logic)
 - Connect this to ChatAgent for “Why did my test fail?” interactions

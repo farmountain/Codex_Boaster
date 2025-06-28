@@ -20,6 +20,11 @@ def log_event(agent: str, payload: dict) -> None:
     bridge.log_event(data)
 
 
+def log_runtime_command(command: str, status: str) -> None:
+    """Tag an executed runtime command."""
+    log_event("TerminalRunner", {"command": command, "status": status})
+
+
 def set_runtime_context(runtime_dict):
     """Record the active runtime configuration."""
     log_event(

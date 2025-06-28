@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import TerminalPanel from "./TerminalPanel"
 
 export default function RuntimeSelector() {
   const [config, setConfig] = useState({
@@ -45,6 +46,9 @@ export default function RuntimeSelector() {
       >
         Save Configuration
       </button>
+      <div className="mt-6">
+        <TerminalPanel />
+      </div>
     </div>
   )
 }
