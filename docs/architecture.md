@@ -6,7 +6,8 @@ codex-booster/
 │   ├── main.py            # FastAPI entry point
 │   ├── agents/            # Architect, Builder, Tester, Reflexion, Exporter, Monetizer
 │   ├── integrations/      # HipCortex bridge
-│   └── services/          # AUREUS helpers and build workflow
+│   ├── services/          # AUREUS helpers and build workflow
+│   └── terminal_runner.py # execute setup commands
 ├── frontend/              # Next.js application
 └── docs/                  # Documentation
 ```
@@ -34,6 +35,7 @@ Additional helper modules are planned for configuration and deployment:
   hosts.
 - **Integration Agent** – detects API/SDK usage and wires credentials.
 - **Test‑Suite Agent** – produces SIT/UAT scripts on top of unit tests.
+- **TerminalRunnerService** – executes setup commands and streams logs to the UI.
 
 - **Marketplace Service** – exposes external components (MCP servers, LLM adapters, database connectors).
 
