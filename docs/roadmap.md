@@ -16,3 +16,6 @@
 - Add feedback loop from Reflexion to BuilderAgent (auto-patch logic)
 - Connect this to ChatAgent for “Why did my test fail?” interactions
 - Build snapshot explorer for test results + reflexion comparisons
+- Extend to include GitHub Actions deploy via CI token
+- Automatically infer deploy targets from config_agent + runtime metadata
+- Store and replay deploy snapshots in the memory explorer UI

@@ -23,6 +23,7 @@ from backend.repo_init_agent import router as repo_init_router
 from backend.builder_agent import router as code_builder_router
 from backend.tester_agent import router as run_test_router
 from backend.test_suite_agent import router as test_suite_router
+from backend.deploy_agent import router as deploy_router
 from backend.reflexion_agent import router as improvement_router
 
 app = FastAPI(title="Codex Booster")
@@ -257,3 +258,4 @@ app.include_router(repo_init_router)
 app.include_router(code_builder_router)
 app.include_router(run_test_router)
 app.include_router(test_suite_router)
+app.include_router(deploy_router)
