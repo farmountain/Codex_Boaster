@@ -28,8 +28,7 @@ metrics.
 
 Additional helper modules are planned for configuration and deployment:
 
-- **Config Agent** – generates `.env`, `docker-compose.yml` and other runtime
-  files from user input.
+- **Config Agent** – generates `.env`, `docker-compose.yml` and other runtime files from user input. The agent parses `.env.template.json`, validates values and writes runtime artifacts. A pre-run validator feeds missing variables to the ReflexionAgent for user feedback.
 - **Repo‑Init Agent** – scaffolds GitHub repositories with CI hooks.
 - **Deploy Agent** – deploys the generated project to Vercel, Render or other
   hosts.
