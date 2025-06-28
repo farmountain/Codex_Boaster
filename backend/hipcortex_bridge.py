@@ -66,3 +66,14 @@ def store_code_snapshot(files: list) -> str:
     snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
     bridge.log_event({"agent": "builder", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
     return snapshot_id
+
+def store_test_results(result: dict) -> str:
+    """Persist test results and return snapshot id."""
+    snapshot = {
+        "type": "test_log",
+        "result": result,
+        "timestamp": get_current_timestamp(),
+    }
+    snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()
+    bridge.log_event({"agent": "tester", "event": "snapshot", "id": snapshot_id, "snapshot": snapshot})
+    return snapshot_id
