@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     res.status(405).end();
     return;
   }
-  const resp = await fetch('http://localhost:8000/repo-init', {
+  const resp = await fetch('http://localhost:8000/api/repo-init', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(req.body),

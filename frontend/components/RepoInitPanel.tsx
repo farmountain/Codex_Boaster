@@ -2,12 +2,11 @@ import { useState } from 'react';
 
 export default function RepoInitPanel() {
   const [form, setForm] = useState({
-    github_token: '',
-    github_user: '',
-    repo_name: '',
+    project_name: '',
     description: '',
-    visibility: 'private',
-    template: 'node',
+    language: 'python',
+    private: true,
+    ci: 'github-actions',
   });
   const [message, setMessage] = useState('');
 
@@ -18,13 +17,13 @@ export default function RepoInitPanel() {
       headers: { 'Content-Type': 'application/json' },
     });
     const data = await res.json();
-    setMessage(data.message || data.error);
+    setMessage(data.repo_url || data.error || data.detail);
   }
 
   return (
     <div className="p-4 border rounded shadow">
       <h2 className="text-xl font-bold mb-4">🗃️ Init New GitHub Repo</h2>
-      {['github_token', 'github_user', 'repo_name', 'description'].map(key => (
+      {['project_name', 'description'].map(key => (
         <input
           key={key}
           className="mb-2 p-2 border w-full"
@@ -35,20 +34,29 @@ export default function RepoInitPanel() {
       ))}
       <select
         className="mb-2 p-2 border w-full"
-        value={form.template}
-        onChange={e => setForm(prev => ({ ...prev, template: e.target.value }))}
+        value={form.language}
+        onChange={e => setForm(prev => ({ ...prev, language: e.target.value }))}
       >
-        <option value="default">Default</option>
-        <option value="node">Node.js</option>
         <option value="python">Python</option>
+        <option value="node">Node.js</option>
+      </select>
+      <select
+        className="mb-2 p-2 border w-full"
+        value={form.ci}
+        onChange={e => setForm(prev => ({ ...prev, ci: e.target.value }))}
+      >
+        <option value="github-actions">GitHub Actions</option>
+        <option value="none">None</option>
       </select>
       <select
         className="mb-4 p-2 border w-full"
-        value={form.visibility}
-        onChange={e => setForm(prev => ({ ...prev, visibility: e.target.value }))}
+        value={form.private ? 'true' : 'false'}
+        onChange={e =>
+          setForm(prev => ({ ...prev, private: e.target.value === 'true' }))
+        }
       >
-        <option value="private">Private</option>
-        <option value="public">Public</option>
+        <option value="true">Private</option>
+        <option value="false">Public</option>
       </select>
       <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded">
         🚀 Create Repository

@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from backend.main import app
 from backend.repo_init_agent import generate_template
+import os
 
 
 def make_resp(status=201, data=None):
@@ -27,7 +28,7 @@ def test_repo_init_success(monkeypatch):
 
     monkeypatch.setattr(
         "backend.repo_init_agent.requests.post",
-        lambda *a, **k: make_resp(),
+        lambda *a, **k: make_resp(data={"html_url": "u/r", "owner": {"login": "u"}}),
     )
     monkeypatch.setattr(
         "backend.repo_init_agent.requests.put",
@@ -38,17 +39,20 @@ def test_repo_init_success(monkeypatch):
         lambda *a, **k: "snap123",
     )
 
+    monkeypatch.setenv("GITHUB_TOKEN", "t")
+
     resp = client.post(
-        "/repo-init",
+        "/api/repo-init",
         json={
-            "github_token": "t",
-            "github_user": "u",
-            "repo_name": "r",
+            "project_name": "r",
             "description": "d",
+            "language": "python",
+            "private": True,
+            "ci": "github-actions",
         },
     )
     assert resp.status_code == 200
-    assert resp.json()["snapshot_id"] == "snap123"
+    assert resp.json()["status"] == "success"
 
 
 def test_repo_init_failure(monkeypatch):
@@ -58,14 +62,14 @@ def test_repo_init_failure(monkeypatch):
         "backend.repo_init_agent.requests.post",
         lambda *a, **k: make_resp(status=400, data={"msg": "fail"}),
     )
+    monkeypatch.setenv("GITHUB_TOKEN", "t")
 
     resp = client.post(
-        "/repo-init",
+        "/api/repo-init",
         json={
-            "github_token": "t",
-            "github_user": "u",
-            "repo_name": "r",
+            "project_name": "r",
             "description": "d",
+            "language": "python",
         },
     )
     assert resp.status_code == 400
