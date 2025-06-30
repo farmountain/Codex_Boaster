@@ -2,18 +2,18 @@ import { useState } from 'react';
 
 export default function DeployPanel() {
   const [form, setForm] = useState({
-    platform: 'vercel',
-    runtime: 'node',
+    provider: 'vercel',
+    framework: 'nextjs',
     project_name: '',
-    token: '',
+    repo_url: '',
   });
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<any>(null);
 
   async function handleDeploy() {
     const res = await fetch('/api/deploy', {
       method: 'POST',
-      body: JSON.stringify(form),
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
     });
     const data = await res.json();
     setResult(data);
@@ -30,31 +30,31 @@ export default function DeployPanel() {
         onChange={(e) => setForm((prev) => ({ ...prev, project_name: e.target.value }))}
       />
 
-      <select
-        className="input mt-2"
-        value={form.runtime}
-        onChange={(e) => setForm((prev) => ({ ...prev, runtime: e.target.value }))}
-      >
-        <option value="node">Node.js</option>
-        <option value="python">Python</option>
-        <option value="nextjs">Next.js</option>
-      </select>
-
-      <select
-        className="input mt-2"
-        value={form.platform}
-        onChange={(e) => setForm((prev) => ({ ...prev, platform: e.target.value }))}
-      >
-        <option value="vercel">Vercel</option>
-        <option value="render">Render</option>
-      </select>
-
       <input
         className="input mt-2"
-        placeholder="Deploy token"
-        value={form.token}
-        onChange={(e) => setForm((prev) => ({ ...prev, token: e.target.value }))}
+        placeholder="Repository URL"
+        value={form.repo_url}
+        onChange={(e) => setForm((prev) => ({ ...prev, repo_url: e.target.value }))}
       />
+
+      <select
+        className="input mt-2"
+        value={form.framework}
+        onChange={(e) => setForm((prev) => ({ ...prev, framework: e.target.value }))}
+      >
+        <option value="nextjs">Next.js</option>
+        <option value="node">Node.js</option>
+        <option value="python">Python</option>
+      </select>
+
+      <select
+        className="input mt-2"
+        value={form.provider}
+        onChange={(e) => setForm((prev) => ({ ...prev, provider: e.target.value }))}
+      >
+        <option value="vercel">Vercel</option>
+        <option value="fly">Fly.io</option>
+      </select>
 
       <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={handleDeploy}>
         Deploy Now
@@ -63,11 +63,15 @@ export default function DeployPanel() {
       {result && (
         <div className="mt-4 bg-gray-100 p-2 rounded">
           <p className="font-semibold">Status: {result.status}</p>
-          <pre className="text-sm text-green-600">{result.output}</pre>
-          {result.error && <pre className="text-sm text-red-500 mt-2">Error: {result.error}</pre>}
+          {result.deployment_url && (
+            <p className="text-sm">Preview: <a className="text-blue-600" href={result.deployment_url}>{result.deployment_url}</a></p>
+          )}
+          {result.logs_url && (
+            <p className="text-sm">Logs: <a className="text-blue-600" href={result.logs_url}>{result.logs_url}</a></p>
+          )}
+          {result.message && <p className="text-xs mt-1">{result.message}</p>}
         </div>
       )}
     </div>
   );
 }
-
