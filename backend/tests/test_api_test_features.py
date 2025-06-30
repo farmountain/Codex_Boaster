@@ -32,3 +32,21 @@ def test_generate_tests_endpoint(monkeypatch):
     )
     assert resp.status_code == 200
     assert resp.json()["test_code"] == "tests"
+
+
+def test_generate_test_suite_endpoint(monkeypatch):
+    client = TestClient(app)
+
+    def fake_gen(code, t):
+        return f"{t}_generated"
+
+    monkeypatch.setattr("backend.test_suite_agent.generate_test_cases", fake_gen)
+
+    payload = {"business_description": "desc"}
+    resp = client.post("/api/test-suite", json=payload)
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["unit_tests"]["test_register_user.py"] == "unit_generated"
+    assert data["sit_tests"]["test_user_flow.py"] == "integration_generated"
+    assert data["uat_scenarios"][0]["title"] == "User logs in with Google"
