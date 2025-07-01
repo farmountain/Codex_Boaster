@@ -6,11 +6,12 @@ export default function ChatPanel() {
   ]);
   const [input, setInput] = useState('');
   const [agent, setAgent] = useState('');
+  const [reflexion, setReflexion] = useState('');
 
   async function sendMessage() {
     const newMsg = { role: 'user', content: input };
-    const updated = [...messages, newMsg];
-    setMessages(updated);
+    const updatedHistory = [...messages];
+    setMessages([...updatedHistory, newMsg]);
     setInput('');
 
     const res = await fetch('/api/chat', {
@@ -18,13 +19,15 @@ export default function ChatPanel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         session_id: 'demo-session',
-        messages: updated
+        message: input,
+        history: updatedHistory
       })
     });
 
     const data = await res.json();
-    setMessages([...updated, { role: 'assistant', content: data.reply }]);
-    setAgent(data.agent);
+    setMessages([...updatedHistory, newMsg, { role: 'assistant', content: data.response }]);
+    setAgent(data.actions[0] || 'ChatAgent');
+    setReflexion(data.reflexion_summary);
   }
 
   return (
@@ -39,6 +42,7 @@ export default function ChatPanel() {
           </div>
         ))}
       </div>
+      {reflexion && <p className="text-xs text-gray-500 mb-2">{reflexion}</p>}
       <input
         className="w-full border p-2 rounded"
         placeholder="Type your question..." value={input}

@@ -3,7 +3,9 @@ import '@testing-library/jest-dom';
 import ChatPanel from '../components/ChatPanel.tsx';
 
 global.fetch = jest.fn(() =>
-  Promise.resolve({ json: () => Promise.resolve({ reply: 'ok', agent: 'ChatAgent' }) })
+  Promise.resolve({
+    json: () => Promise.resolve({ response: 'ok', actions: [], reflexion_summary: 'sum' })
+  })
 );
 
 test('shows welcome message and sends chat', async () => {
