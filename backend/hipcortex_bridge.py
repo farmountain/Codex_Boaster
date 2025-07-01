@@ -3,12 +3,28 @@ import json
 from datetime import datetime
 from hashlib import md5
 from urllib import request, error
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import List, Dict
+from difflib import unified_diff
 
 from backend.integrations.hipcortex_bridge import HipCortexBridge
 
 HIPCORTEX_URL = os.getenv("HIPCORTEX_URL", "http://hipcortex")
 
 bridge = HipCortexBridge(base_url=HIPCORTEX_URL)
+
+router = APIRouter()
+LOG_DIR = "hipcortex_logs"
+class MemorySnapshot(BaseModel):
+    session_id: str
+    agent: str
+    step: str
+    content: str
+    confidence: float
+    timestamp: str | None = None
+    reflexion_classification: str | None = None
+
 
 def get_current_timestamp() -> str:
     """Return UTC timestamp string."""
@@ -163,3 +179,79 @@ def get_reflexion_logs():
             "log": "TestRefactor completed \u2192 Code stable.",
         },
     ]
+
+# New HipCortex memory API
+
+
+
+def _load(path):
+    if os.path.exists(path):
+        with open(path) as f:
+            return json.load(f)
+    return {"versions": [], "current_version": None}
+
+
+def _save(path, data):
+    os.makedirs(LOG_DIR, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+@router.post("/api/hipcortex/record")
+async def record_snapshot(snap: MemorySnapshot):
+    snap.timestamp = snap.timestamp or datetime.utcnow().isoformat()
+    session_path = os.path.join(LOG_DIR, f"{snap.session_id}.json")
+    data = _load(session_path)
+
+    version = f"v{len(data['versions'])+1}"
+    snapshot = snap.dict()
+    snapshot["version"] = version
+
+    prev_content = data["versions"][-1]["content"] if data["versions"] else ""
+    diff = "\n".join(
+        unified_diff(
+            prev_content.splitlines(),
+            snap.content.splitlines(),
+            fromfile=data.get("current_version") or version,
+            tofile=version,
+        )
+    )
+    snapshot["diff"] = diff
+
+    data["versions"].append(snapshot)
+    data["current_version"] = version
+
+    _save(session_path, data)
+    return {"status": "success", "version": version}
+
+
+@router.get("/api/hipcortex/logs")
+async def get_logs(session_id: str):
+    session_path = os.path.join(LOG_DIR, f"{session_id}.json")
+    return _load(session_path)["versions"]
+
+
+@router.post("/api/hipcortex/rollback")
+async def rollback_version(payload: Dict):
+    session_id = payload["session_id"]
+    target = payload["target_version"]
+    path = os.path.join(LOG_DIR, f"{session_id}.json")
+    data = _load(path)
+    if not any(v["version"] == target for v in data["versions"]):
+        raise HTTPException(status_code=404, detail="Version not found")
+    data["current_version"] = target
+    _save(path, data)
+    return {"status": "rollback successful", "current_version": target}
+
+
+@router.get("/api/hipcortex/query")
+async def query_sessions(confidence_lt: float):
+    results = []
+    if not os.path.exists(LOG_DIR):
+        return results
+    for fname in os.listdir(LOG_DIR):
+        data = _load(os.path.join(LOG_DIR, fname))
+        if any(v.get("confidence", 1.0) < confidence_lt for v in data["versions"]):
+            results.append(fname.split(".")[0])
+    return results
+

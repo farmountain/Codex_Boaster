@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react"
-import ConfidenceScore from "./ConfidenceScore"
+import { useEffect, useState } from "react";
+import ConfidenceScore from "./ConfidenceScore";
 
 export default function ReflexionPanel() {
-  const [logs, setLogs] = useState([])
+  const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    fetch("/api/reflexion/logs")
+    fetch("/api/hipcortex/logs?session_id=demo-session")
       .then(res => res.json())
-      .then(setLogs)
-  }, [])
+      .then(setLogs);
+  }, []);
 
   return (
     <div className="p-4 space-y-4">
@@ -16,13 +16,15 @@ export default function ReflexionPanel() {
       {logs.map((log, index) => (
         <div key={index} className="p-3 border rounded shadow">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-500">{log.timestamp}</span>
+            <span className="text-sm text-gray-500">{log.timestamp} ({log.version})</span>
             <ConfidenceScore score={log.confidence} />
           </div>
-          <div className="mt-2 text-sm font-medium text-blue-800">{log.suggestion}</div>
-          <div className="text-sm text-gray-600 mt-1">{log.log}</div>
+          {log.reflexion_classification && (
+            <div className="text-xs text-purple-700 mt-1">{log.reflexion_classification}</div>
+          )}
+          <pre className="text-xs bg-gray-50 p-2 mt-2 whitespace-pre-wrap">{log.diff}</pre>
         </div>
       ))}
     </div>
-  )
+  );
 }
