@@ -52,6 +52,7 @@ export default function Dashboard() {
       </SignedOut>
       <SignedIn>
         <h1>Dashboard</h1>
+        <a href="/configure-env" className="text-blue-600 underline">Configure</a>
         <UsageMeter />
         <input
           value={prompt}

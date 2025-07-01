@@ -1,10 +1,9 @@
-import { useState } from 'react';
-import RuntimeSelector from '../components/RuntimeSelector';
-import EnvVarForm from '../components/EnvVarForm';
-import SetupPreview from '../components/SetupPreview';
+import { useState } from 'react'
+import RuntimeSelector from '../components/RuntimeSelector'
+import EnvVarForm from '../components/EnvVarForm'
+import SetupPreview from '../components/SetupPreview'
 
 export default function ConfigPage() {
-  const [envVars, setEnvVars] = useState({});
   const [setupScript, setSetupScript] = useState([
     'npm install',
     'pip install -r requirements.txt',
@@ -14,18 +13,17 @@ export default function ConfigPage() {
     await fetch('/api/configure-env', {
       method: 'POST',
       body: JSON.stringify({
-        env_vars: envVars,
         setup_script: setupScript,
       }),
       headers: { 'Content-Type': 'application/json' },
-    });
+    })
   }
 
   return (
     <div className="p-4 space-y-4">
       <h1 className="text-xl font-bold">Configure Environment</h1>
       <RuntimeSelector />
-      <EnvVarForm envVars={envVars} setEnvVars={setEnvVars} />
+      <EnvVarForm />
       <textarea
         className="border p-2 w-full"
         value={setupScript.join('\n')}
