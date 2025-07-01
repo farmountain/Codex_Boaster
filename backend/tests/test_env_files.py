@@ -16,7 +16,7 @@ def test_configure_env_writes_files(tmp_path, monkeypatch):
     resp = client.post(
         '/configure-env',
         json={
-            'runtimes': {'python': '3.11', 'node': '18', 'go': '1.19'},
+            'runtimes': {'python': '3.11', 'node': '18', 'rust': '1.71'},
             'env_vars': {'API_KEY': '123'},
             'setup_script': [],
             'llm_services': []

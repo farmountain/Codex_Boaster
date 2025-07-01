@@ -22,7 +22,7 @@ The system follows a TDD-first workflow guided by six cooperating agents:
 Agent interactions rely on chain-of-thought prompts recorded in HipCortex. The
 AUREUS framework evaluates failed attempts and feeds new instructions back to
 the Builder. Multiple language runtimes are preinstalled (Python, Node.js,
-Rust, Go, Bun, Java, Swift and Ruby) so users can mix stacks per project.
+Rust, Bun, Java, Swift and Ruby) so users can mix stacks per project.
 
 
 All memory and reasoning context flows through `hipcortex_bridge.py`.  The

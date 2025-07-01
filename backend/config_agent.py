@@ -22,7 +22,11 @@ SUPABASE_KEY = os.getenv("SUPABASE_API_KEY")
 class RuntimeConfig(BaseModel):
     python: str
     node: str
-    go: str
+    rust: str
+
+class LanguageVersion(BaseModel):
+    language: str
+    version: str
 
 class EnvConfig(BaseModel):
     runtimes: Dict[str, str]
@@ -112,7 +116,7 @@ def _write_docker_compose(config: EnvConfig) -> None:
 @router.get("/runtime-config", response_model=RuntimeConfig)
 def get_runtime_config():
     if not os.path.exists(CONFIG_PATH):
-        return RuntimeConfig(python="3.10", node="18", go="1.19")
+        return RuntimeConfig(python="3.11", node="18", rust="1.72")
     with open(CONFIG_PATH) as f:
         data = json.load(f)
         return RuntimeConfig(**data.get("runtime", {}))
@@ -129,6 +133,22 @@ def save_runtime_config(config: RuntimeConfig):
         json.dump(full_config, f, indent=2)
     set_runtime_context(config.dict())
     return {"message": "Runtime config saved."}
+
+
+@router.post("/api/config/runtime")
+def set_single_runtime(cfg: LanguageVersion):
+    """Update a single language runtime."""
+    full_config = {}
+    if os.path.exists(CONFIG_PATH):
+        with open(CONFIG_PATH) as f:
+            full_config = json.load(f)
+    runtimes = full_config.get("runtime", {})
+    runtimes[cfg.language.lower()] = cfg.version
+    full_config["runtime"] = runtimes
+    with open(CONFIG_PATH, "w") as f:
+        json.dump(full_config, f, indent=2)
+    set_runtime_context(runtimes)
+    return {"message": f"Runtime set to {cfg.language} {cfg.version}"}
 
 
 @router.post("/configure-env")
