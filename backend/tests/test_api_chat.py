@@ -6,8 +6,18 @@ from backend.main import app
 
 def test_chat_endpoint():
     client = TestClient(app)
-    payload = {"session_id": "s1", "messages": [{"role": "user", "content": "plan my app"}]}
-    resp = client.post("/chat", json=payload)
+    payload = {
+        "session_id": "s1",
+        "message": "plan my app",
+        "history": [],
+    }
+    resp = client.post("/api/chat", json=payload)
     assert resp.status_code == 200
     data = resp.json()
-    assert "reply" in data and "agent" in data and "snapshot_id" in data
+    assert {
+        "response",
+        "actions",
+        "reflexion_summary",
+        "memory_log",
+        "snapshot_id",
+    }.issubset(data.keys())
