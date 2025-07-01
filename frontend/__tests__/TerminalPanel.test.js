@@ -1,17 +1,15 @@
 import { render, fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import TerminalPanel from '../components/TerminalPanel.tsx'
+import axios from 'axios'
+
+jest.mock('axios')
 
 test('displays command output', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      json: () => Promise.resolve({ stdout: 'hi', stderr: '', exit_code: 0, log_id: '1' })
-    })
-  )
+  axios.post.mockResolvedValue({ data: { stdout: 'hi', stderr: '', exit_code: 0, log_id: '1' } })
 
   render(<TerminalPanel />)
-  fireEvent.click(screen.getByText(/Run Setup/))
-  expect(fetch).toHaveBeenCalled()
-  const outputs = await screen.findAllByText('hi')
-  expect(outputs.length).toBeGreaterThan(0)
+  fireEvent.click(screen.getByText(/Run/))
+  expect(axios.post).toHaveBeenCalled()
+  await screen.findByText('hi')
 })
