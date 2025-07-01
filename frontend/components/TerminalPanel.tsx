@@ -4,14 +4,16 @@ export default function TerminalPanel() {
   const [commands, setCommands] = useState(["npm install", "pytest"])
   const [logs, setLogs] = useState([])
 
-  const runCommands = () => {
-    const ws = new WebSocket("ws://localhost:8000/ws/run-setup")
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ commands }))
-    }
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      setLogs((prev) => [...prev, data])
+  const runCommands = async () => {
+    setLogs([])
+    for (const cmd of commands) {
+      const resp = await fetch('/api/run-setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: cmd })
+      })
+      const data = await resp.json()
+      setLogs(prev => [...prev, { command: cmd, ...data }])
     }
   }
 
@@ -37,13 +39,13 @@ export default function TerminalPanel() {
         {logs.map((log, idx) => (
           <div
             key={idx}
-            className={`p-2 border rounded text-sm ${log.status === "error" ? "bg-red-100" : log.status ? "bg-green-100" : ""}`}
+            className={`p-2 border rounded text-sm ${log.exit_code === 0 ? "bg-green-100" : "bg-red-100"}`}
           >
             {log.command && (
               <div className="font-mono text-xs text-gray-500">{log.command}</div>
             )}
-            {log.output && (
-              <pre className="text-xs whitespace-pre-wrap">{log.output}</pre>
+            {log.stdout && (
+              <pre className="text-xs whitespace-pre-wrap">{log.stdout}</pre>
             )}
             {log.stderr && (
               <pre className="text-xs text-red-600">{log.stderr}</pre>

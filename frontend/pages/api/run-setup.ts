@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     res.status(405).end()
     return
   }
-  const resp = await fetch('http://localhost:8000/run-setup', {
+  const resp = await fetch('http://localhost:8000/api/run-setup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(req.body)

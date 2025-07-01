@@ -2,19 +2,17 @@ import { render, fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import TerminalPanel from '../components/TerminalPanel.tsx'
 
-test('displays websocket logs', async () => {
-  const wsMock = {
-    send: jest.fn(),
-    close: jest.fn(),
-    onopen: null,
-    onmessage: null
-  }
-  global.WebSocket = jest.fn(() => wsMock)
+test('displays command output', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () =>
+        Promise.resolve({ stdout: 'hi', stderr: '', exit_code: 0, log_id: '1' })
+    })
+  )
+
   render(<TerminalPanel />)
   fireEvent.click(screen.getByText(/Run Setup/))
-  wsMock.onopen && wsMock.onopen()
-  const msg = { command: 'echo hi', status: 'success' }
-  wsMock.onmessage && wsMock.onmessage({ data: JSON.stringify(msg) })
-  expect(await screen.findByText('echo hi')).toBeInTheDocument()
+  expect(fetch).toHaveBeenCalled()
+  expect(await screen.findByText('hi')).toBeInTheDocument()
 })
 
