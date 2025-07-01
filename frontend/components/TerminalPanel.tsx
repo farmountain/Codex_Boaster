@@ -1,57 +1,75 @@
 import { useState } from "react"
+import axios from "axios"
 
 export default function TerminalPanel() {
-  const [commands, setCommands] = useState(["npm install", "pytest"])
-  const [logs, setLogs] = useState([])
+  const [command, setCommand] = useState("pytest -q")
+  const [output, setOutput] = useState("")
+  const [stderr, setStderr] = useState("")
+  const [exitCode, setExitCode] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [logId, setLogId] = useState("")
 
-  const runCommands = async () => {
-    setLogs([])
-    for (const cmd of commands) {
-      const resp = await fetch('/api/run-setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ command: cmd })
+  const runCommand = async () => {
+    setLoading(true)
+    setOutput("")
+    setStderr("")
+    setExitCode(null)
+    try {
+      const res = await axios.post("/api/run-setup", {
+        command,
+        cwd: "./workspace",
+        env: {}
       })
-      const data = await resp.json()
-      setLogs(prev => [...prev, { command: cmd, ...data }])
+      setOutput(res.data.stdout)
+      setStderr(res.data.stderr)
+      setExitCode(res.data.exit_code)
+      setLogId(res.data.log_id)
+    } catch (err) {
+      setStderr("Error running command.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const downloadLog = () => {
+    if (logId) {
+      window.open(`/logs/runtime/${logId}.log`, "_blank")
     }
   }
 
   return (
-    <div className="p-4">
-      <h2 className="font-bold text-lg mb-2">Terminal Runner</h2>
-
-      <textarea
-        className="w-full p-2 border rounded text-sm"
-        rows={4}
-        value={commands.join("\n")}
-        onChange={(e) => setCommands(e.target.value.split("\n"))}
-      />
-
-      <button
-        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
-        onClick={runCommands}
-      >
-        Run Setup
-      </button>
-
-      <div className="mt-4 space-y-3">
-        {logs.map((log, idx) => (
-          <div
-            key={idx}
-            className={`p-2 border rounded text-sm ${log.exit_code === 0 ? "bg-green-100" : "bg-red-100"}`}
+    <div className="bg-black text-white font-mono p-4 rounded shadow-md h-[400px] flex flex-col">
+      <div className="mb-2 flex items-center gap-2">
+        <input
+          className="flex-1 bg-gray-900 border border-gray-700 px-2 py-1 rounded"
+          value={command}
+          onChange={e => setCommand(e.target.value)}
+          disabled={loading}
+        />
+        <button
+          onClick={runCommand}
+          disabled={loading}
+          className="bg-green-600 px-4 py-1 rounded text-white"
+        >
+          {loading ? "Running..." : "Run"}
+        </button>
+        {logId && (
+          <button
+            onClick={downloadLog}
+            className="bg-gray-700 px-3 py-1 rounded text-white"
           >
-            {log.command && (
-              <div className="font-mono text-xs text-gray-500">{log.command}</div>
-            )}
-            {log.stdout && (
-              <pre className="text-xs whitespace-pre-wrap">{log.stdout}</pre>
-            )}
-            {log.stderr && (
-              <pre className="text-xs text-red-600">{log.stderr}</pre>
-            )}
-          </div>
-        ))}
+            Download Log
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1 bg-gray-800 p-2 rounded overflow-auto text-sm whitespace-pre-wrap">
+        {output && <pre className="text-green-300">{output}</pre>}
+        {stderr && <pre className="text-red-400">{stderr}</pre>}
+      </div>
+
+      <div className="mt-2 text-xs text-gray-400">
+        Exit Code: {exitCode} | Log ID: {logId}
       </div>
     </div>
   )
