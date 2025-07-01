@@ -50,3 +50,4 @@ def test_generate_test_suite_endpoint(monkeypatch):
     assert data["unit_tests"]["test_register_user.py"] == "unit_generated"
     assert data["sit_tests"]["test_user_flow.py"] == "integration_generated"
     assert data["uat_scenarios"][0]["title"] == "User logs in with Google"
+    assert "uat_markdown" in data
