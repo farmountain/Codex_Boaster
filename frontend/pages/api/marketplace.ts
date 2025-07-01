@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     res.status(405).end();
     return;
   }
-  const resp = await fetch('http://localhost:8000/marketplace', {
+  const resp = await fetch('http://localhost:8000/api/marketplace', {
     method: 'GET'
   });
   const data = await resp.json();
