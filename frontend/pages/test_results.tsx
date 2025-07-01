@@ -1,33 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
+import TestMatrix from "../components/TestMatrix"
+import TestResultPanel from "../components/TestResultPanel"
 
 interface Results {
-  success: boolean | null;
-  output?: string;
+  success: boolean | null
+  stdout?: string
+  stderr?: string
+  output?: string
 }
 
 export default function TestResults() {
-  const [results, setResults] = useState<Results | null>(null);
+  const [results, setResults] = useState<Results | null>(null)
 
   useEffect(() => {
     fetch("http://localhost:8000/test_results")
       .then((res) => res.json())
-      .then((data) => setResults(data));
-  }, []);
-
-  if (!results) {
-    return <div>Loading...</div>;
-  }
+      .then((data) => setResults(data))
+  }, [])
 
   return (
-    <div>
-      <h1>Test Results</h1>
-      {results.success === null ? (
-        <p>No tests run yet.</p>
-      ) : results.success ? (
-        <p>Tests Passed</p>
-      ) : (
-        <p>Tests Failed</p>
+    <div className="p-4 space-y-4">
+      <TestMatrix />
+      {results && results.success !== null && (
+        <TestResultPanel stdout={results.output || results.stdout} stderr={results.stderr} />
       )}
     </div>
-  );
+  )
 }

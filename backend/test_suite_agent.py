@@ -7,6 +7,17 @@ from backend.hipcortex_bridge import log_event
 
 router = APIRouter()
 
+def scenarios_to_markdown(scenarios: List[Dict]) -> str:
+    """Convert UAT scenarios to markdown format."""
+    lines = []
+    for s in scenarios:
+        lines.append(f"### {s['title']}")
+        for i, step in enumerate(s['steps'], 1):
+            lines.append(f"{i}. {step}")
+        lines.append(f"**Expected:** {s['expected']}")
+        lines.append("")
+    return "\n".join(lines)
+
 class TestGenRequest(BaseModel):
     file_name: str
     code: str
@@ -29,6 +40,7 @@ class TestSuiteResponse(BaseModel):
     unit_tests: Dict[str, str]
     sit_tests: Dict[str, str]
     uat_scenarios: List[UATScenario]
+    uat_markdown: str | None = None
 
 @router.post("/generate-tests")
 async def generate_tests(req: TestGenRequest):
@@ -62,6 +74,7 @@ async def generate_test_suite(req: TestSuiteRequest):
             "expected": "User is logged in and sees the dashboard",
         }
     ]
+    uat_markdown = scenarios_to_markdown(uat_scenarios)
 
     log_event(
         "TestSuiteAgent",
@@ -76,4 +89,5 @@ async def generate_test_suite(req: TestSuiteRequest):
         "unit_tests": unit_tests,
         "sit_tests": sit_tests,
         "uat_scenarios": uat_scenarios,
+        "uat_markdown": uat_markdown,
     }
