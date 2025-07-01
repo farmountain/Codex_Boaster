@@ -9,6 +9,7 @@ from pathlib import Path
 import tempfile
 
 from backend.integrations.hipcortex_bridge import HipCortexBridge
+from backend.hipcortex_bridge import router as hipcortex_router
 from backend.agents.architect_agent import ArchitectAgent
 from backend.agents.builder_agent import BuilderAgent
 from backend.agents.tester_agent import TesterAgent
@@ -264,4 +265,5 @@ app.include_router(code_builder_router)
 app.include_router(run_test_router)
 app.include_router(test_suite_router)
 app.include_router(deploy_router)
+app.include_router(hipcortex_router)
 app.include_router(terminal_runner_router)

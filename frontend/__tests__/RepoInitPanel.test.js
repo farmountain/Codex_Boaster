@@ -3,12 +3,12 @@ import '@testing-library/jest-dom';
 import RepoInitPanel from '../components/RepoInitPanel.tsx';
 
 global.fetch = jest.fn(() =>
-  Promise.resolve({ json: () => Promise.resolve({ message: 'Repo created' }) })
+  Promise.resolve({ json: () => Promise.resolve({ repo_url: 'Repo created' }) })
 );
 
 test('renders all fields and submits form', async () => {
   render(<RepoInitPanel />);
-  ['github_token', 'github_user', 'repo_name', 'description'].forEach((p) => {
+  ['project_name', 'description'].forEach((p) => {
     expect(screen.getByPlaceholderText(p)).toBeInTheDocument();
   });
   fireEvent.click(screen.getByText(/Create Repository/));

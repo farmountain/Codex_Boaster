@@ -7,7 +7,7 @@ export default function DeployPanel() {
     project_name: '',
     repo_url: '',
   });
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState(null);
 
   async function handleDeploy() {
     const res = await fetch('/api/deploy', {
