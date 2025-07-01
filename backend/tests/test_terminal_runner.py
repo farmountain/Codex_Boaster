@@ -3,14 +3,14 @@ from backend.main import app
 import backend.terminal_runner as tr
 
 
-def test_run_setup_script_multiple_commands(tmp_path, monkeypatch):
+def test_run_single_command(tmp_path, monkeypatch):
     client = TestClient(app)
     monkeypatch.setattr(tr, "LOG_DIR", tmp_path)
-    resp = client.post("/run-setup", json={"commands": ["echo hi", "echo world"]})
+    resp = client.post("/api/run-setup", json={"command": "echo hello"})
     assert resp.status_code == 200
     data = resp.json()
-    assert len(data["results"]) == 2
-    assert all(r["status"] == "success" for r in data["results"])
-    assert any(tmp_path.iterdir())
+    assert data["stdout"].strip() == "hello"
+    assert data["exit_code"] == 0
+    assert (tmp_path / f"{data['log_id']}.log").exists()
 
 

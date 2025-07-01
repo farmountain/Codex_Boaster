@@ -1,9 +1,11 @@
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, HTTPException
 from pydantic import BaseModel
+from typing import Dict
 import subprocess
 from pathlib import Path
 from datetime import datetime
 import os
+import uuid
 
 from backend.hipcortex_bridge import log_runtime_command
 
@@ -14,6 +16,56 @@ router = APIRouter()
 
 class SetupCommandRequest(BaseModel):
     commands: list[str]
+
+
+class RunCommandRequest(BaseModel):
+    """Request model for a single command run."""
+    command: str
+    cwd: str = "./"
+    env: Dict[str, str] = {}
+
+
+class RunCommandResponse(BaseModel):
+    stdout: str
+    stderr: str
+    exit_code: int
+    log_id: str
+
+
+@router.post("/api/run-setup", response_model=RunCommandResponse)
+async def run_single_command(req: RunCommandRequest):
+    """Run a single shell command and return its output."""
+    try:
+        log_id = f"run-{uuid.uuid4().hex[:8]}"
+        env = os.environ.copy()
+        env.update(req.env)
+        proc = subprocess.run(
+            req.command,
+            shell=True,
+            capture_output=True,
+            cwd=req.cwd,
+            env=env,
+            timeout=30,
+        )
+
+        log_path = LOG_DIR / f"{log_id}.log"
+        with log_path.open("w") as lf:
+            lf.write(f"$ {req.command}\n{proc.stdout.decode('utf-8')}{proc.stderr.decode('utf-8')}\n")
+
+        status = "success" if proc.returncode == 0 else "error"
+        log_runtime_command(req.command, status)
+
+        return {
+            "stdout": proc.stdout.decode("utf-8"),
+            "stderr": proc.stderr.decode("utf-8"),
+            "exit_code": proc.returncode,
+            "log_id": log_id,
+        }
+
+    except subprocess.TimeoutExpired:
+        raise HTTPException(status_code=408, detail="Command timed out.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/run-setup")
 def run_setup_script(request: SetupCommandRequest):
