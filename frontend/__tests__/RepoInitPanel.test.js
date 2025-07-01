@@ -1,17 +1,19 @@
-import { render, fireEvent, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import RepoInitPanel from '../components/RepoInitPanel.tsx';
+import { render, fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import RepoInitPanel from '../components/RepoInitPanel.tsx'
+import axios from 'axios'
 
-global.fetch = jest.fn(() =>
-  Promise.resolve({ json: () => Promise.resolve({ repo_url: 'Repo created' }) })
-);
+jest.mock('axios')
 
 test('renders all fields and submits form', async () => {
-  render(<RepoInitPanel />);
-  ['project_name', 'description'].forEach((p) => {
-    expect(screen.getByPlaceholderText(p)).toBeInTheDocument();
-  });
-  fireEvent.click(screen.getByText(/Create Repository/));
-  expect(fetch).toHaveBeenCalled();
-  await screen.findByText('Repo created');
-});
+  axios.post.mockResolvedValue({ data: { repo_url: 'Repo created', ci_setup: 'github-actions' } })
+
+  render(<RepoInitPanel />)
+
+  expect(screen.getByPlaceholderText('Project Name')).toBeInTheDocument()
+  expect(screen.getByPlaceholderText('Project Description')).toBeInTheDocument()
+
+  fireEvent.click(screen.getByText(/Create Repository/))
+  expect(axios.post).toHaveBeenCalledWith('/api/repo-init', expect.any(Object))
+  await screen.findByText('Repo created')
+})
