@@ -4,7 +4,7 @@ This short guide explains how to try Codex Booster locally. The platform exposes
 an API powered by FastAPI and a small Next.js interface. The dashboard
 presents **Plan**, **Build**, **Test** and **Deploy** actions that drive the
 agent workflow. When creating a project you can choose the language runtime
-(Python, Node.js, Rust, Go, Bun, Java, Swift or Ruby) and provide any secrets
+(Python, Node.js, Rust, Bun, Java, Swift or Ruby) and provide any secrets
 inline. A drop‑down also lets you upload a setup script or open an interactive
 terminal.
 

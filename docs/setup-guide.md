@@ -3,10 +3,10 @@
 This guide explains how to configure and run setup commands via the Terminal Runner.
 
 ## Configuration
-Available runtime versions are defined by the backend. Typical options include Python 3.10+, Node 18+ and Go 1.19+. Environment variables follow KEY=value format. Saving the form also generates `.env.template.json` with empty values for easy sharing.
+Available runtime versions are defined by the backend. Typical options include Python 3.11+, Node 18+ and Rust 1.72. Environment variables follow KEY=value format. Saving the form also generates `.env.template.json` with empty values for easy sharing.
 
 1. Navigate to the **Configure Environment** page in the frontend.
-2. Adjust the runtime versions for Python, Node or Go.
+2. Adjust the runtime versions for Python, Node or Rust.
 3. Add any required environment variables.
 4. Enter your setup commands, one per line.
 

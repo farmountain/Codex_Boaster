@@ -1,54 +1,73 @@
-import { useState, useEffect } from "react"
-import TerminalPanel from "./TerminalPanel"
+import { useState } from "react"
+import axios from "axios"
+
+const runtimeOptions = {
+  Python: ["3.8", "3.10", "3.11"],
+  Node: ["16", "18", "20"],
+  Rust: ["1.70", "1.71", "1.72"],
+}
 
 export default function RuntimeSelector() {
-  const [config, setConfig] = useState({
-    python: "3.10",
-    node: "18",
-    go: "1.19"
-  })
+  const [language, setLanguage] = useState("Python")
+  const [version, setVersion] = useState(runtimeOptions["Python"][0])
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
 
-  useEffect(() => {
-    fetch("/api/runtime-config")
-      .then(res => res.json())
-      .then(setConfig)
-  }, [])
-
-  const saveConfig = async () => {
-    const res = await fetch("/api/runtime-config", {
-      method: "POST",
-      body: JSON.stringify(config),
-      headers: { "Content-Type": "application/json" }
-    })
-    const data = await res.json()
-    alert(data.message)
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const res = await axios.post("/api/config/runtime", { language, version })
+      setMessage(`Runtime set to ${language} ${version}`)
+    } catch (e) {
+      setMessage("Failed to update runtime")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="p-6 border rounded shadow">
-      <h2 className="text-xl font-bold mb-4">Runtime Environment Setup</h2>
-      <div className="space-y-4">
-        {["python", "node", "go"].map((lang) => (
-          <div key={lang} className="flex items-center space-x-4">
-            <label className="w-24 capitalize">{lang}</label>
-            <input
-              type="text"
-              value={config[lang]}
-              onChange={(e) => setConfig({ ...config, [lang]: e.target.value })}
-              className="border px-2 py-1 rounded w-32"
-            />
-          </div>
-        ))}
+    <div className="p-4 rounded border bg-white shadow-md">
+      <h2 className="text-lg font-semibold mb-2">Runtime Selector</h2>
+
+      <div className="mb-4">
+        <label className="block mb-1">Language:</label>
+        <select
+          value={language}
+          onChange={(e) => {
+            const lang = e.target.value
+            setLanguage(lang)
+            setVersion(runtimeOptions[lang][0])
+          }}
+          className="border p-2 w-full"
+        >
+          {Object.keys(runtimeOptions).map((lang) => (
+            <option key={lang}>{lang}</option>
+          ))}
+        </select>
       </div>
+
+      <div className="mb-4">
+        <label className="block mb-1">Version:</label>
+        <select
+          value={version}
+          onChange={(e) => setVersion(e.target.value)}
+          className="border p-2 w-full"
+        >
+          {runtimeOptions[language].map((v) => (
+            <option key={v}>{v}</option>
+          ))}
+        </select>
+      </div>
+
       <button
-        onClick={saveConfig}
-        className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        onClick={handleSubmit}
+        className="bg-blue-600 text-white px-4 py-2 rounded"
+        disabled={loading}
       >
-        Save Configuration
+        {loading ? "Saving..." : "Set Runtime"}
       </button>
-      <div className="mt-6">
-        <TerminalPanel />
-      </div>
+
+      {message && <p className="mt-2 text-sm text-gray-700">{message}</p>}
     </div>
   )
 }

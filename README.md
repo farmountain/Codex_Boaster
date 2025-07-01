@@ -56,7 +56,7 @@ in real time and saved under `logs/runtime/` for later review.
 
 ### Runtime Configuration
 
-Use the **Runtime Selector** and **EnvVarForm** components to choose your Python, Node or Go versions and enter any required environment variables. Saving this form writes `.env`, `.env.template.json`, `docker-compose.yml` and `codexbooster.config.json` for repeatable setups.
+Use the **Runtime Selector** and **EnvVarForm** components to choose your Python, Node or Rust versions and enter any required environment variables. Saving this form writes `.env`, `.env.template.json`, `docker-compose.yml` and `codexbooster.config.json` for repeatable setups.
 
 ## Tests
 

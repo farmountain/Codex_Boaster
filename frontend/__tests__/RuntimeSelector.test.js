@@ -1,20 +1,15 @@
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import RuntimeSelector from '../components/RuntimeSelector.tsx';
+import { render, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import RuntimeSelector from '../components/RuntimeSelector.tsx'
+import axios from 'axios'
 
-test('loads and saves runtime config', async () => {
-  const fetchMock = jest.fn()
-    .mockResolvedValueOnce({ json: () => Promise.resolve({ python: '3.10', node: '18', go: '1.19' }) })
-    .mockResolvedValueOnce({ json: () => Promise.resolve({ message: 'Runtime config saved.' }) });
+jest.mock('axios')
 
-  global.fetch = fetchMock;
+test('submits selected runtime', async () => {
+  axios.post.mockResolvedValue({ data: { message: 'ok' } })
 
-  const { getByText, getByDisplayValue } = render(<RuntimeSelector />);
-  await waitFor(() => getByDisplayValue('3.10'));
+  const { getByText } = render(<RuntimeSelector />)
+  fireEvent.click(getByText(/Set Runtime/))
 
-  fireEvent.change(getByDisplayValue('3.10'), { target: { value: '3.11' } });
-  fireEvent.click(getByText(/Save Configuration/));
-
-  expect(fetchMock).toHaveBeenCalledTimes(2);
-  expect(fetchMock.mock.calls[1][0]).toBe('/api/runtime-config');
-});
+  expect(axios.post).toHaveBeenCalledWith('/api/config/runtime', { language: 'Python', version: '3.8' })
+})
