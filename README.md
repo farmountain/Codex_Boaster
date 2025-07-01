@@ -58,6 +58,16 @@ in real time and saved under `logs/runtime/` for later review.
 
 Use the **Runtime Selector** and **EnvVarForm** components to choose your Python, Node or Rust versions and manage secrets. The env editor fetches values from the backend and supports masking secrets before saving them back to `.env`. Saving writes `.env`, `.env.template.json`, `docker-compose.yml` and `codexbooster.config.json` for repeatable setups.
 
+### Memory Snapshots
+
+All agent reasoning is captured as **versioned memory snapshots** under `hipcortex_logs/`. The API exposes:
+
+- `POST /api/hipcortex/record` – append a snapshot with timestamp and confidence.
+- `GET /api/hipcortex/logs?session_id=<id>` – retrieve the full trace.
+- `POST /api/hipcortex/rollback` – restore `current_version` to an earlier id.
+
+This allows auditing decisions and exploring diffs across build attempts.
+
 ## Tests
 
 Execute Python tests with `pytest` and frontend tests with `npm test`.
