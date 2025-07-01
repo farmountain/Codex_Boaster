@@ -1,51 +1,95 @@
-export default function EnvVarForm({ envVars, setEnvVars }) {
-  const updateKey = (oldKey, newKey) => {
-    const updated = { ...envVars };
-    const value = updated[oldKey];
-    delete updated[oldKey];
-    updated[newKey] = value;
-    setEnvVars(updated);
-  };
+import { useEffect, useState } from "react"
+import axios from "axios"
 
-  const updateValue = (key, val) => {
-    setEnvVars(prev => ({ ...prev, [key]: val }));
-  };
+type EnvVar = { key: string; value: string; show?: boolean }
 
-  const addVar = () => {
-    setEnvVars({ ...envVars, '': '' });
-  };
+export default function EnvVarForm() {
+  const [envVars, setEnvVars] = useState<EnvVar[]>([])
+  const [original, setOriginal] = useState<EnvVar[]>([])
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
 
-  const removeVar = (key) => {
-    const updated = { ...envVars };
-    delete updated[key];
-    setEnvVars(updated);
-  };
+  useEffect(() => {
+    axios.get("/api/config/env").then(res => {
+      const vars = res.data.map((v: EnvVar) => ({ ...v, show: false }))
+      setEnvVars(vars)
+      setOriginal(vars)
+    })
+  }, [])
+
+  const handleChange = (index: number, field: keyof EnvVar, value: string) => {
+    const updated = [...envVars]
+    ;(updated[index] as any)[field] = value
+    setEnvVars(updated)
+  }
+
+  const toggleShow = (index: number) => {
+    const updated = [...envVars]
+    updated[index].show = !updated[index].show
+    setEnvVars(updated)
+  }
+
+  const addRow = () => {
+    setEnvVars([...envVars, { key: "", value: "", show: false }])
+  }
+
+  const deleteRow = (index: number) => {
+    setEnvVars(envVars.filter((_, i) => i !== index))
+  }
+
+  const save = async () => {
+    setLoading(true)
+    try {
+      await axios.post("/api/config/env", {
+        env: envVars.map(({ key, value }) => ({ key, value })),
+      })
+      setOriginal(envVars)
+      setMessage("✅ Environment updated")
+    } catch {
+      setMessage("❌ Failed to save")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const changed = (idx: number) => {
+    const o = original[idx]
+    const n = envVars[idx]
+    return !o || o.key !== n.key || o.value !== n.value
+  }
 
   return (
-    <div>
-      <h2>Environment Variables</h2>
-      {Object.entries(envVars).map(([key, val]) => (
-        <div key={key} className="mb-2 flex items-center">
+    <div className="p-4 bg-white shadow rounded">
+      <h2 className="text-lg font-semibold mb-2">Environment Variables</h2>
+
+      {envVars.map((pair, idx) => (
+        <div key={idx} className="flex gap-2 mb-2 items-center">
           <input
-            type="text"
+            className={`flex-1 border px-2 py-1 ${changed(idx) ? "border-blue-500" : ""}`}
+            value={pair.key}
+            onChange={e => handleChange(idx, "key", e.target.value)}
             placeholder="KEY"
-            value={key}
-            onChange={e => updateKey(key, e.target.value)}
-            className="border p-2 mr-2"
           />
           <input
-            type="password"
+            className={`flex-1 border px-2 py-1 ${changed(idx) ? "border-blue-500" : ""}`}
+            type={pair.show ? "text" : "password"}
+            value={pair.value}
+            onChange={e => handleChange(idx, "value", e.target.value)}
             placeholder="VALUE"
-            value={val}
-            onChange={e => updateValue(key, e.target.value)}
-            className="border p-2 mr-2"
           />
-          <button onClick={() => removeVar(key)} className="text-red-500">x</button>
+          <button onClick={() => toggleShow(idx)} className="text-sm">{pair.show ? "🙈" : "👁"}</button>
+          <button onClick={() => deleteRow(idx)} className="text-red-500">🗑</button>
         </div>
       ))}
-      <button onClick={addVar} className="mt-2 text-blue-600 underline">
-        + Add Variable
-      </button>
+
+      <div className="flex gap-4 mt-4">
+        <button onClick={addRow} className="bg-gray-600 text-white px-3 py-1 rounded">+ Add</button>
+        <button onClick={save} className="bg-blue-600 text-white px-4 py-1 rounded" disabled={loading}>
+          {loading ? "Saving..." : "Save"}
+        </button>
+      </div>
+
+      {message && <p className="text-sm mt-2 text-gray-700">{message}</p>}
     </div>
-  );
+  )
 }

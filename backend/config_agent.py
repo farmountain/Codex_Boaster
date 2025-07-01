@@ -28,6 +28,13 @@ class LanguageVersion(BaseModel):
     language: str
     version: str
 
+class EnvVar(BaseModel):
+    key: str
+    value: str
+
+class EnvRequest(BaseModel):
+    env: List[EnvVar]
+
 class EnvConfig(BaseModel):
     runtimes: Dict[str, str]
     env_vars: Dict[str, str]
@@ -111,6 +118,26 @@ def _write_docker_compose(config: EnvConfig) -> None:
     compose = {"version": "3", "services": services}
     with open(DOCKER_COMPOSE, "w") as f:
         yaml.dump(compose, f)
+
+
+@router.get("/api/config/env")
+async def read_env():
+    envs = []
+    if os.path.exists(ENV_FILE):
+        with open(ENV_FILE) as f:
+            for line in f:
+                if "=" in line and not line.strip().startswith("#"):
+                    key, val = line.strip().split("=", 1)
+                    envs.append({"key": key, "value": val})
+    return envs
+
+
+@router.post("/api/config/env")
+async def write_env(req: EnvRequest):
+    with open(ENV_FILE, "w") as f:
+        for item in req.env:
+            f.write(f"{item.key}={item.value}\n")
+    return {"status": "updated"}
 
 
 @router.get("/runtime-config", response_model=RuntimeConfig)
