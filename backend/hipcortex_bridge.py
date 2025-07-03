@@ -300,3 +300,11 @@ async def query_sessions(confidence_lt: float):
             results.append(fname.split(".")[0])
     return results
 
+
+@router.get("/api/hipcortex/memory-log")
+async def get_memory_log(session_id: str):
+    """Return all memory snapshots for a session ordered by timestamp."""
+    session_path = os.path.join(LOG_DIR, f"{session_id}.json")
+    logs = _load(session_path)["versions"]
+    return sorted(logs, key=lambda x: x.get("timestamp", ""))
+
