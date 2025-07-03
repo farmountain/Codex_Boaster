@@ -3,11 +3,19 @@ from pydantic import BaseModel
 from typing import List
 import json
 import os
+from pathlib import Path
+
+import jsonschema
+
+from .logger import log_event
 
 router = APIRouter()
 
 # JSON file used to persist plugin metadata. Path can be patched in tests.
 PLUGIN_STORE = "plugins.json"
+SCHEMA_PATH = Path(__file__).with_name("plugin_manifest.schema.json")
+with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
+    PLUGIN_SCHEMA = json.load(f)
 
 
 class Plugin(BaseModel):
@@ -22,15 +30,23 @@ class Plugin(BaseModel):
     enabled: bool = True
 
 
+def validate_manifest(data: dict) -> None:
+    """Validate plugin manifest using JSON schema."""
+    jsonschema.validate(data, PLUGIN_SCHEMA)
+
+
 @router.post("/api/marketplace/register")
 async def register_plugin(plugin: Plugin):
     """Register a new plugin in the local store."""
     plugins = _load_plugins()
+    manifest = plugin.dict()
+    validate_manifest(manifest)
     if any(p["plugin_id"] == plugin.plugin_id for p in plugins):
         raise HTTPException(status_code=400, detail="Plugin already registered")
 
-    plugins.append(plugin.dict())
+    plugins.append(manifest)
     _save_plugins(plugins)
+    await log_event("Marketplace", {"event": "register", "plugin": plugin.plugin_id})
     return {"status": "success", "message": "Plugin registered"}
 
 
@@ -48,6 +64,10 @@ async def toggle_plugin(plugin_id: str):
         if p["plugin_id"] == plugin_id:
             p["enabled"] = not p.get("enabled", True)
             _save_plugins(plugins)
+            await log_event(
+                "Marketplace",
+                {"event": "toggle", "plugin": plugin_id, "enabled": p["enabled"]},
+            )
             return {"status": "success", "enabled": p["enabled"]}
     raise HTTPException(status_code=404, detail="Plugin not found")
 

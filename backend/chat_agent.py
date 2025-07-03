@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List
 
-from backend.hipcortex_bridge import store_chat_snapshot, log_event
+from backend.hipcortex_bridge import store_chat_snapshot
+from backend.logger import log_event
 
 router = APIRouter()
 
@@ -50,7 +51,7 @@ async def chat_with_codex(req: ChatRequest):
             }
         )
 
-        log_event(
+        await log_event(
             "ChatAgent",
             {"session": req.session_id, "agent": actions[0] if actions else "ChatAgent"},
         )

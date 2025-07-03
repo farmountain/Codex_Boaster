@@ -5,12 +5,12 @@ from datetime import datetime
 
 from .llm_client import generate_improvement_suggestions
 from .hipcortex_bridge import (
-    log_event,
     store_reflexion_snapshot,
     get_reflexion_logs,
     emit_confidence_log,
     emit_reflexion_log,
 )
+from .logger import log_event
 from .services.aureus import compute_confidence
 
 router = APIRouter()
@@ -121,11 +121,14 @@ async def reflect(req: ReflexionRequest):
         plan if isinstance(plan, str) else str(plan),
         confidence=plan.get("confidence", 0.7) if isinstance(plan, dict) else 0.7,
     )
-    log_event("ReflexionAgent", {
-        "test_summary": req.test_log[:200],
-        "steps": len(plan.get("steps", [])) if isinstance(plan, dict) else 0,
-        "confidence": plan.get("confidence", "N/A") if isinstance(plan, dict) else "N/A"
-    })
+    await log_event(
+        "ReflexionAgent",
+        {
+            "test_summary": req.test_log[:200],
+            "steps": len(plan.get("steps", [])) if isinstance(plan, dict) else 0,
+            "confidence": plan.get("confidence", "N/A") if isinstance(plan, dict) else "N/A",
+        },
+    )
     return {"plan": plan, "snapshot_id": snapshot_id}
 
 

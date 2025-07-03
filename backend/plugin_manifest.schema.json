@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "plugin_id": {"type": "string"},
+    "name": {"type": "string"},
+    "type": {"type": "string"},
+    "entrypoint": {"type": "string", "format": "uri"},
+    "capabilities": {"type": "array", "items": {"type": "string"}},
+    "version": {"type": "string"},
+    "enabled": {"type": "boolean"}
+  },
+  "required": ["plugin_id", "name", "type", "entrypoint", "capabilities", "version"],
+  "additionalProperties": false
+}
