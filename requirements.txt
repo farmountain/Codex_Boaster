@@ -5,3 +5,4 @@ stripe
 PyYAML
 requests
 httpx
+transformers

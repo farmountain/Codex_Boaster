@@ -25,6 +25,7 @@ repositories.  Users select language runtimes such as Python, Node or Rust
   dashboard.
 
 - **Marketplace** lists MCP servers, LLM adapters and database connectors for easy integration
+- **Hugging Face Transformers** library enables offline code generation
 
 Additional UX highlights:
 
