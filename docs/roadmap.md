@@ -36,3 +36,8 @@
 - Scaffold plugin.yaml schema and submission guide for contributors
 - Add marketplace integration logging into HipCortex for traceability
 - Extend UI to support plugin categories, search, and version filters
+- Build agent wrappers for each best-practice prompting function (Planner, Folder, Debugger, Reflexion, Orchestrator)
+- Train Codex Agents on `Parahelp SOP` and `Prompt Folding` examples
+- Version and tag prompt outputs for reusability (Prompt Library)
+- Benchmark improvement using `Debug Log Agent` + Reflexion-based evaluations
+- Integrate visual prompt flows and SOP dashboards in frontend UI

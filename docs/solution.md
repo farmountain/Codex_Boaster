@@ -40,3 +40,7 @@ are launched automatically from CI once the test matrix passes.
 
 The frontend polls `/test_results` and `/improvement_suggestion` to provide live
 feedback during the build process.
+
+### Codex Booster Agentic Framework
+
+The technical solution now incorporates the best practices documented in the [Agentic Framework](agentic-framework.md). Planning relies on Parahelp SOP prompts while Prompt Folding selects small or large LLMs depending on task complexity. DebugLogAgent records gaps in test coverage, ChainReflexionAgent turns those signals into improved prompts and PromptLibraryAgent versions all final outputs. These agents are coordinated by FDEOrchestratorAgent for seamless deployments.

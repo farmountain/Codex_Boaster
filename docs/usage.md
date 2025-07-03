@@ -8,6 +8,12 @@ agent workflow. When creating a project you can choose the language runtime
 inline. A drop‑down also lets you upload a setup script or open an interactive
 terminal.
 
+The recommended workflow follows the [Agentic Framework](agentic-framework.md):
+start with ParahelpPlannerAgent to capture requirements, let PromptBoosterAgent
+generate code using prompt folding, review gaps through DebugLogAgent, then
+iterate via ChainReflexionAgent. Prompts that pass tests are stored by
+PromptLibraryAgent and orchestrated into deployments by FDEOrchestratorAgent.
+
 Example prompts:
 
 - *"Build an AI planner with Stripe billing"* – triggers the Planner and Repo‑Init agents.
