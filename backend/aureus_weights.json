@@ -1,0 +1,7 @@
+{
+  "base": 0.5,
+  "evidence": 0.1,
+  "retry": -0.2,
+  "success": 0.2,
+  "contradiction": -0.3
+}

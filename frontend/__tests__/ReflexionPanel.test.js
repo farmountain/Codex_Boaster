@@ -14,4 +14,5 @@ test('displays fetched logs in order', async () => {
   const items = screen.getAllByText(/d1|d2/)
   expect(items[0]).toBe(first)
   expect(items.length).toBe(2)
+  expect(document.querySelector('svg')).toBeInTheDocument()
 })

@@ -36,6 +36,30 @@ def log_event(agent: str, payload: dict) -> None:
     bridge.log_event(data)
 
 
+def emit_confidence_log(step: str, content: str, score: float, session_id: str) -> None:
+    """Send a confidence snapshot to HipCortex."""
+    payload = {
+        "agent": "ReflexionAgent",
+        "step": step,
+        "content": content,
+        "confidence": score,
+        "timestamp": get_current_timestamp(),
+        "session_id": session_id,
+    }
+    try:
+        request.urlopen(
+            request.Request(
+                url=f"{HIPCORTEX_URL}/api/hipcortex/record",
+                data=json.dumps(payload).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            ),
+            timeout=5,
+        )
+    except error.URLError:
+        pass
+
+
 def log_runtime_command(command: str, status: str) -> None:
     """Tag an executed runtime command."""
     log_event("TerminalRunner", {"command": command, "status": status})
