@@ -6,14 +6,13 @@ from backend.main import app
 def test_parse_and_emit_trace_posts(monkeypatch):
     captured = {}
 
-    def fake_post(url, json):
-        captured['url'] = url
-        captured['payload'] = json
-        class R:
-            status_code = 200
-        return R()
+    def fake_emit(step, content, score, session_id):
+        captured['step'] = step
+        captured['content'] = content
+        captured['score'] = score
+        captured['session'] = session_id
 
-    monkeypatch.setattr(ra.requests, 'post', fake_post)
+    monkeypatch.setattr(ra, 'emit_confidence_log', fake_emit)
     log = (
         "Step 1: Attempted run failed.\n"
         "Step 2: Hypothesis - missing import.\n"
@@ -21,20 +20,21 @@ def test_parse_and_emit_trace_posts(monkeypatch):
     )
     ra.parse_and_emit_trace('s1', 'ReflexionAgent', log, confidence=0.8)
 
-    assert captured['url'] == 'http://localhost:8000/api/hipcortex/record'
-    assert captured['payload']['session_id'] == 's1'
-    assert captured['payload']['agent'] == 'ReflexionAgent'
-    assert 'Hypothesis' in captured['payload']['content']
+    assert captured['session'] == 's1'
+    assert 'Plan' in captured['step']
+    assert captured['score'] == 0.8
+    assert 'Hypothesis' in captured['content']
 
 
 def test_reflexion_endpoint_emits_trace(monkeypatch):
     called = {}
 
-    def fake_emit(session_id, agent, reasoning_log, confidence=0.7):
+    def fake_emit(session_id, agent, reasoning_log, confidence=None):
         called['session'] = session_id
         called['agent'] = agent
         called['log'] = reasoning_log
         called['conf'] = confidence
+        return 0.5
 
     monkeypatch.setattr(ra, 'parse_and_emit_trace', fake_emit)
     client = TestClient(app)

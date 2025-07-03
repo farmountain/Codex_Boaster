@@ -8,7 +8,9 @@ from .hipcortex_bridge import (
     log_event,
     store_reflexion_snapshot,
     get_reflexion_logs,
+    emit_confidence_log,
 )
+from .services.aureus import compute_confidence
 
 router = APIRouter()
 
@@ -17,8 +19,8 @@ def parse_and_emit_trace(
     session_id: str,
     agent: str,
     reasoning_log: str,
-    confidence: float = 0.7,
-) -> None:
+    confidence: float | None = None,
+) -> float:
     """Parse a free-form reasoning log and persist it via HipCortex."""
     steps = [s.strip() for s in reasoning_log.strip().split("\n") if s.strip()]
     cause = ""
@@ -33,18 +35,13 @@ def parse_and_emit_trace(
         elif "plan" in low or "retry" in low:
             action = line
 
-    payload = {
-        "session_id": session_id,
-        "agent": agent,
-        "step": action or "Reflexion Step",
-        "content": "\n".join(filter(None, [cause, hypothesis, action])),
-        "confidence": confidence,
-        "timestamp": datetime.utcnow().isoformat(),
-    }
+    score = confidence if confidence is not None else compute_confidence(reasoning_log)
+    payload_content = "\n".join(filter(None, [cause, hypothesis, action]))
     try:
-        requests.post("http://localhost:8000/api/hipcortex/record", json=payload)
+        emit_confidence_log(action or "Reflexion Step", payload_content, score, session_id)
     except Exception as e:  # pragma: no cover - network failure shouldn't crash
         print(f"[HipCortex] Failed to log reasoning trace: {e}")
+    return score
 
 class ReflexionRequest(BaseModel):
     test_log: str

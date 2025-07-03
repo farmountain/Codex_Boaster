@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ConfidenceScore from "./ConfidenceScore";
+import ConfidenceTrend from "./ConfidenceTrend";
 
 export default function ReflexionPanel() {
   const [logs, setLogs] = useState([]);
@@ -13,6 +14,7 @@ export default function ReflexionPanel() {
   return (
     <div className="p-4 space-y-4">
       <h2 className="text-xl font-bold">Reflexion History</h2>
+      <ConfidenceTrend scores={logs.map(l => l.confidence)} />
       {logs.map((log, index) => (
         <div key={index} className="p-3 border rounded shadow">
           <div className="flex justify-between items-center">
