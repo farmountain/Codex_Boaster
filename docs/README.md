@@ -5,6 +5,7 @@ specialised agents.  All reasoning state is stored in **HipCortex**.
 
 - [Architecture](architecture.md)
 - [Technical Solution](solution.md)
+- [Agentic Framework](agentic-framework.md)
 - [Roadmap](roadmap.md)
 - [Usage](usage.md)
 - [Use Cases](use_cases.md)

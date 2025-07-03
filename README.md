@@ -5,6 +5,8 @@ working software.  A set of specialised agents handle planning, code
 generation, testing, reflexion and billing.  All reasoning state is recorded in
 **HipCortex**, enabling a persistent memory of each build attempt.
 
+The project implements a multi-agent workflow based on the best practices in the [Codex Booster Agentic Framework](docs/agentic-framework.md). Planning starts with Parahelp SOP prompts, build tasks use prompt folding, testing relies on debug logs and reflexion chains and an orchestrator manages deployments and prompt library updates.
+
 The current UI is organised around a sidebar project switcher, an **Agent
 Panel** for chat-driven workflows and a modular workspace that lists active
 repositories.  Users select language runtimes such as Python, Node or Rust
@@ -89,6 +91,8 @@ Architecture diagrams, design notes and the development roadmap are kept in
 [Use Cases](docs/use_cases.md) page lists example prompts by value stream. See
 [Marketplace Guide](docs/marketplace.md) if you want to contribute your own
 connectors.
+
+The [Agentic Framework](docs/agentic-framework.md) summarises best-practice prompting strategies inspired by the Y Combinator "State-Of-The-Art Prompting For AI Agents" episode.
 
 [Use Cases](docs/use_cases.md) page lists example prompts by value stream.
 

@@ -46,3 +46,7 @@ latest reasoning traces stored in HipCortex.
 
 The frontend consumes these API endpoints to display plans, build results and
 billing status to the user.
+
+## Agentic Framework Overview
+
+Codex Booster applies an agentic software development framework derived from the Y Combinator "State-Of-The-Art Prompting For AI Agents" podcast. Each value stream step maps to a dedicated agent and prompt technique, as outlined in [agentic-framework.md](agentic-framework.md). The framework emphasises Parahelp SOP prompts for planning, prompt folding during build, debug logging for tests, reflexion chains for improvement and an orchestrator for deployment.
