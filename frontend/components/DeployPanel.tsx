@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 
 export default function DeployPanel() {
@@ -7,6 +7,7 @@ export default function DeployPanel() {
   const [provider, setProvider] = useState("vercel")
   const [status, setStatus] = useState("idle")
   const [result, setResult] = useState(null)
+  const [buildLogs, setBuildLogs] = useState("")
 
   const deploy = async () => {
     setStatus("pending")
@@ -24,9 +25,27 @@ export default function DeployPanel() {
     }
   }
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    async function poll() {
+      const res = await axios.get("/api/deploy/status")
+      setBuildLogs(res.data.logs)
+      if (res.data.status !== "pending") {
+        clearInterval(timer)
+      }
+    }
+    if (status === "pending") {
+      timer = setInterval(poll, 2000)
+    }
+    return () => clearInterval(timer)
+  }, [status])
+
   return (
     <div className="p-4 bg-white shadow rounded space-y-4">
-      <h2 className="text-lg font-bold">🚀 One-Click Deployment</h2>
+      <h2 className="text-lg font-bold flex items-center space-x-2">
+        <span>🚀 One-Click Deployment</span>
+        <span className={`text-sm ${status === 'success' ? 'text-green-600' : status === 'pending' ? 'text-yellow-600' : 'text-gray-600'}`}>{status}</span>
+      </h2>
 
       <div className="space-y-2">
         <input
@@ -55,7 +74,7 @@ export default function DeployPanel() {
           disabled={status === "pending"}
           className="bg-blue-600 text-white px-4 py-2 rounded"
         >
-          {status === "pending" ? "Deploying..." : "Deploy"}
+          {status === "pending" ? "Deploying..." : "Deploy Now"}
         </button>
       </div>
 
@@ -86,6 +105,10 @@ export default function DeployPanel() {
           </div>
           <div className="text-gray-500">{result.message}</div>
         </div>
+      )}
+
+      {buildLogs && (
+        <pre className="bg-gray-100 p-2 mt-2 overflow-x-auto text-xs">{buildLogs}</pre>
       )}
 
       {status === "error" && (

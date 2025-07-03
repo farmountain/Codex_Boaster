@@ -11,7 +11,7 @@ The system follows a TDD-first workflow guided by six cooperating agents:
 5. **ExporterAgent** packages artefacts once tests pass.
 6. **MonetizerAgent** records usage and creates Stripe charges.
 7. **Config Agent** builds runtime files such as `.env` and `docker-compose.yml`.
-8. **Repo‑Init Agent** creates a GitHub repository with CI/CD hooks.
+8. **Repo‑Init Agent** creates a Git repository with GitHub Actions or GitLab CI templates for full CI/CD.
 9. **Integration Agent** wires external APIs (Supabase, Clerk, Stripe, etc.).
 10. **Test‑Suite Agent** generates SIT and UAT plans.
 11. **Deploy Agent** provisions preview deployments.
