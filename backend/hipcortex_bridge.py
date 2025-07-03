@@ -60,6 +60,26 @@ def emit_confidence_log(step: str, content: str, score: float, session_id: str) 
         pass
 
 
+def emit_reflexion_log(payload: dict) -> None:
+    """Send a reflexion retry log to HipCortex."""
+    data = {
+        **payload,
+        "timestamp": payload.get("timestamp", get_current_timestamp()),
+    }
+    try:
+        request.urlopen(
+            request.Request(
+                url=f"{HIPCORTEX_URL}/api/hipcortex/record",
+                data=json.dumps(data).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            ),
+            timeout=5,
+        )
+    except error.URLError:
+        pass
+
+
 def log_runtime_command(command: str, status: str) -> None:
     """Tag an executed runtime command."""
     log_event("TerminalRunner", {"command": command, "status": status})
@@ -135,12 +155,13 @@ def store_test_results(result: dict) -> str:
     return snapshot_id
 
 
-def store_reflexion_snapshot(req, plan) -> str:
+def store_reflexion_snapshot(req, plan, parent: str | None = None) -> str:
     """Persist reflexion improvement plan and return snapshot id."""
     snapshot = {
         "type": "reflexion_trace",
         "input": {"test_log": req.test_log, "code": req.code_snippet},
         "plan": plan,
+        "parent": parent,
         "timestamp": get_current_timestamp(),
     }
     snapshot_id = md5(json.dumps(snapshot).encode()).hexdigest()

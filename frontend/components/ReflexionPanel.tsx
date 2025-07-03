@@ -4,11 +4,17 @@ import ConfidenceTrend from "./ConfidenceTrend";
 
 export default function ReflexionPanel() {
   const [logs, setLogs] = useState([]);
+  const [pendingRetry, setPendingRetry] = useState<any | null>(null);
+  const [decision, setDecision] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/hipcortex/logs?session_id=demo-session")
       .then(res => res.json())
-      .then(setLogs);
+      .then(data => {
+        setLogs(data);
+        const last = data[data.length - 1];
+        if (last && last.type === 'retry') setPendingRetry(last);
+      });
   }, []);
 
   return (
@@ -27,6 +33,22 @@ export default function ReflexionPanel() {
           <pre className="text-xs bg-gray-50 p-2 mt-2 whitespace-pre-wrap">{log.diff}</pre>
         </div>
       ))}
+      {pendingRetry && !decision && (
+        <div className="p-3 border rounded bg-yellow-50">
+          <p className="text-sm">Retry attempt {pendingRetry.attempt} suggested: {pendingRetry.justification}</p>
+          <div className="space-x-2 mt-2">
+            <button className="px-2 py-1 bg-green-600 text-white text-xs rounded" onClick={() => setDecision('approved')}>
+              Approve Retry
+            </button>
+            <button className="px-2 py-1 bg-red-600 text-white text-xs rounded" onClick={() => setDecision('aborted')}>
+              Abort
+            </button>
+          </div>
+        </div>
+      )}
+      {decision && (
+        <div className="text-xs text-gray-600">User decision: {decision}</div>
+      )}
     </div>
   );
 }
