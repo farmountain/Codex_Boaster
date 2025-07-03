@@ -11,6 +11,8 @@ from backend.services.secrets import get_secret
 
 router = APIRouter()
 
+latest_deploy_status = {"status": "idle", "logs": ""}
+
 
 class DeployRequest(BaseModel):
     """Input payload for deployment."""
@@ -48,6 +50,9 @@ async def deploy_app(req: DeployRequest):
 
     provider = req.provider.lower()
     framework = req.framework or _detect_framework(req.repo_url)
+
+    latest_deploy_status["status"] = "pending"
+    latest_deploy_status["logs"] = ""
 
     log_event("DeployAgent", {
         "action": "deploy",
@@ -109,6 +114,8 @@ async def deploy_app(req: DeployRequest):
         "result": result,
     })
     result["snapshot_id"] = snapshot_id
+    latest_deploy_status["status"] = result.get("status", "unknown")
+    latest_deploy_status["logs"] = result.get("message", "")
     return result
 
 
@@ -140,3 +147,9 @@ async def rollback(req: RollbackRequest):
         raise HTTPException(status_code=500, detail=proc.stderr)
     else:
         raise HTTPException(status_code=400, detail="Unsupported deployment provider")
+
+
+@router.get("/api/deploy/status")
+def deploy_status():
+    """Return latest deployment status and logs."""
+    return latest_deploy_status

@@ -10,25 +10,62 @@ router = APIRouter()
 
 GITHUB_API = "https://api.github.com"
 
-# Simple CI workflow template used when `ci` is "github-actions"
-WORKFLOW_TEMPLATE = """
-name: CI
+GITHUB_CI_TEMPLATE = """
+name: Codex Booster CI/CD
 
-on: [push]
+on:
+  push:
+    branches: [ 'main' ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
-      - name: Install deps
-        run: pip install -r requirements.txt || true
+          python-version: 3.10
+      - name: Install backend
+        run: pip install -r backend/requirements.txt
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install frontend
+        run: |
+          cd frontend
+          npm ci
       - name: Run tests
-        run: pytest || echo 'no tests'
+        run: |
+          pytest
+          cd frontend && npm test
+      - name: Deploy
+        run: |
+          curl -X POST https://your-deploy-endpoint/api/deploy \
+               -H 'Authorization: Bearer ${{ secrets.CI_TOKEN }}'
+""".strip()
+
+GITLAB_CI_TEMPLATE = """
+stages:
+  - test
+  - build
+  - deploy
+
+build:
+  script:
+    - pip install -r backend/requirements.txt
+    - cd frontend && npm install
+
+test:
+  script:
+    - pytest
+    - cd frontend && npm test
+
+deploy:
+  script:
+    - curl -X POST https://your-deploy-endpoint/api/deploy
 """.strip()
 
 
@@ -79,9 +116,12 @@ async def initialize_repo(req: RepoInitRequest):
     push_initial_files(owner, req.project_name, files, headers)
 
     if req.ci == "github-actions":
-        workflow_path = ".github/workflows/main.yml"
-        ci_content = WORKFLOW_TEMPLATE
+        workflow_path = ".github/workflows/codex_booster.yml"
+        ci_content = GITHUB_CI_TEMPLATE
         push_file(owner, req.project_name, workflow_path, ci_content, headers)
+    elif req.ci == "gitlab":
+        ci_content = GITLAB_CI_TEMPLATE
+        push_file(owner, req.project_name, ".gitlab-ci.yml", ci_content, headers)
 
     log_event(
         "RepoInitAgent",
@@ -137,3 +177,15 @@ def push_initial_files(owner: str, repo: str, files: dict, headers: dict) -> Non
 
     for path, content in files.items():
         push_file(owner, repo, path, content, headers)
+
+
+def scaffold_cicd(repo_path: str, provider: str = "github") -> None:
+    """Write CI/CD templates into a local repository path."""
+    if provider == "github":
+        ci_path = os.path.join(repo_path, ".github", "workflows")
+        os.makedirs(ci_path, exist_ok=True)
+        with open(os.path.join(ci_path, "codex_booster.yml"), "w") as f:
+            f.write(GITHUB_CI_TEMPLATE)
+    elif provider == "gitlab":
+        with open(os.path.join(repo_path, ".gitlab-ci.yml"), "w") as f:
+            f.write(GITLAB_CI_TEMPLATE)

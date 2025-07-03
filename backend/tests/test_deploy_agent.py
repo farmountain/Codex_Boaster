@@ -44,3 +44,15 @@ def test_deploy_unsupported_provider():
     )
     assert resp.status_code == 400
     assert resp.json()["detail"] == "Unsupported deployment provider"
+
+
+def test_deploy_status_endpoint():
+    client = TestClient(app)
+    # set global status
+    from backend import deploy_agent
+    deploy_agent.latest_deploy_status["status"] = "success"
+    deploy_agent.latest_deploy_status["logs"] = "ok"
+
+    resp = client.get("/api/deploy/status")
+    assert resp.status_code == 200
+    assert resp.json() == {"status": "success", "logs": "ok"}
