@@ -8,9 +8,11 @@ const plans = [
 export default function PlanSelector() {
   const [selected, setSelected] = useState(null);
 
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
   async function checkout(plan) {
     setSelected(plan);
-    await fetch('http://localhost:8000/charge', {
+    await fetch(`${baseUrl}/charge`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: 'test', amount: plan.amount }),
