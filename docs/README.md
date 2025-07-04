@@ -11,4 +11,5 @@ specialised agents.  All reasoning state is stored in **HipCortex**.
 - [Use Cases](use_cases.md)
 - [Marketplace Guide](marketplace.md)
 - [Setup Guide](setup-guide.md)
+- [End-to-End Test Plan](e2e_test_plan.md)
 
