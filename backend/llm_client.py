@@ -1,9 +1,43 @@
 from typing import Dict
+import os
+import httpx
 
 
 def call_ollama_or_openai(prompt: str) -> str:
-    """Placeholder LLM call for tests."""
-    # In a real implementation this would call Ollama or OpenAI APIs.
+    """Call Ollama or OpenAI depending on env vars.
+
+    Falls back to a local stub when no configuration is provided.
+    """
+    ollama_url = os.getenv("OLLAMA_URL")
+    openai_key = os.getenv("OPENAI_API_KEY")
+
+    if ollama_url:
+        model = os.getenv("OLLAMA_MODEL", "codex")
+        resp = httpx.post(
+            f"{ollama_url}/api/generate",
+            json={"model": model, "prompt": prompt},
+            timeout=60,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data.get("response") or data.get("choices", [{}])[0].get("text", "")
+
+    if openai_key:
+        model = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+        resp = httpx.post(
+            "https://api.openai.com/v1/chat/completions",
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+            },
+            headers={"Authorization": f"Bearer {openai_key}"},
+            timeout=60,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["choices"][0]["message"]["content"]
+
+    # cost-saving stub when no API key provided
     return "# generated code\n"
 
 

@@ -33,6 +33,14 @@ Example prompts:
    ```
 3. Open `http://localhost:8000/docs` to inspect the available endpoints.
 
+### LLM Configuration
+
+Set `OLLAMA_URL` (and optional `OLLAMA_MODEL`) to run a local model.
+If `OPENAI_API_KEY` is configured, the client uses OpenAI's API with the
+`OPENAI_MODEL` environment variable (default `gpt-3.5-turbo`). When neither is
+set the system falls back to a small offline stub so tests run without network
+access.
+
 ## Frontend
 
 1. Navigate to the `frontend` folder and install packages:
