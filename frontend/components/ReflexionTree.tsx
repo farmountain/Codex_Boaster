@@ -13,15 +13,28 @@ export type TraceNode = {
   children?: TraceNode[]
 }
 
-export default function ReflexionTree({ sessionId }: { sessionId: string }) {
+export default function ReflexionTree({
+  sessionId,
+  steps,
+}: {
+  sessionId?: string
+  steps?: TraceNode[]
+}) {
   const [trace, setTrace] = useState<TraceNode[]>([])
   const [selected, setSelected] = useState<TraceNode | null>(null)
   const [compare, setCompare] = useState(false)
 
   useEffect(() => {
-    axios.get(`/api/hipcortex/logs?session_id=${sessionId}`)
-      .then(res => setTrace(res.data || []))
-  }, [sessionId])
+    if (steps && steps.length > 0) {
+      setTrace(steps)
+      return
+    }
+    if (sessionId) {
+      axios
+        .get(`/api/hipcortex/logs?session_id=${sessionId}`)
+        .then((res) => setTrace(res.data || []))
+    }
+  }, [sessionId, steps])
 
   const renderNode = (node: TraceNode) => (
     <div key={node.version} className="ml-4">
