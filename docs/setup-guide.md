@@ -20,3 +20,7 @@ pytest
 
 Click **Run Setup** to execute these commands. Output is streamed to the browser and stored under `logs/runtime/` with a timestamped log file.
 
+
+## Security
+
+All Terminal Runner endpoints require a valid JWT sent in the `Authorization` header. The token payload must include a `role` field and only users with the `admin` role can execute setup commands. In addition, commands are validated against an allow list of common build tools such as `npm`, `pip`, `pytest`, `python` and `node`. Any command outside this list is rejected.
