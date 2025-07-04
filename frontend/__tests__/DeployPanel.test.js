@@ -21,5 +21,5 @@ fireEvent.click(screen.getByRole('button', { name: /Deploy Now/ }))
     framework: 'nextjs'
   })
 await screen.findByText(/Deployment Triggered/)
-await screen.findByText('done')
+  await screen.findByText('ok')
 });

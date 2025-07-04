@@ -4,7 +4,14 @@ import ReflexionTree from '../components/ReflexionTree.tsx';
 
 test('renders reasoning trace tree', () => {
   const steps = [
-    { step: 'Investigate', why: 'failure', fix: 'check db', confidence: 7 }
+    {
+      version: '1',
+      agent: 'tester',
+      step: 'Investigate',
+      content: 'check db',
+      confidence: 0.9,
+      timestamp: new Date().toISOString(),
+    },
   ];
   render(<ReflexionTree steps={steps} />);
   expect(screen.getByText(/Investigate/)).toBeInTheDocument();

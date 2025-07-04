@@ -8,12 +8,13 @@ global.fetch = jest.fn(() =>
 
 test('renders plan options', () => {
   render(<PlanSelector />);
-  expect(screen.getByText(/starter Plan/i)).toBeInTheDocument();
+  expect(screen.getByText(/Basic - \$10/)).toBeInTheDocument();
+  expect(screen.getByText(/Pro - \$20/)).toBeInTheDocument();
 });
 
 test('calls charge endpoint on continue', async () => {
   render(<PlanSelector />);
-  fireEvent.click(screen.getByText(/Continue to Checkout/));
+  fireEvent.click(screen.getByText('Basic - $10'));
   expect(fetch).toHaveBeenCalled();
 });
 
