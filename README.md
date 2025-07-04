@@ -59,7 +59,7 @@ in real time and saved under `logs/runtime/` for later review.
 
 ### Runtime Configuration
 
-Use the **Runtime Selector** and **EnvVarForm** components to choose your Python, Node or Rust versions and manage secrets. The env editor fetches values from the backend and supports masking secrets before saving them back to `.env`. Saving writes `.env`, `.env.template.json`, `docker-compose.yml` and `codexbooster.config.json` for repeatable setups.
+Use the **Runtime Selector** and **EnvVarForm** components to choose your Python, Node or Rust versions and manage secrets. The env editor fetches values from the backend and supports masking secrets before saving them back to `.env`. Saving writes `.env`, `.env.template.json`, `docker-compose.yml` and `codexbooster.config.json` for repeatable setups. See [docs/setup-guide.md](docs/setup-guide.md) for the full list of environment variables required for HipCortex, OpenAI, Stripe and deployment targets along with an example `.env.template.json` to help deploy securely.
 
 ### Memory Snapshots
 
