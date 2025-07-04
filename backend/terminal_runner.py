@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, HTTPException
+from fastapi import APIRouter, WebSocket, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Dict
 import subprocess
@@ -8,6 +8,24 @@ import os
 import uuid
 
 from backend.hipcortex_bridge import log_runtime_command
+from backend.security import require_role
+
+ALLOWED_BINARIES = {
+    "npm",
+    "pip",
+    "pytest",
+    "python",
+    "node",
+    "echo",
+    "ls",
+    "pwd",
+}
+
+
+def _validate_command(cmd: str) -> None:
+    binary = cmd.strip().split()[0]
+    if binary not in ALLOWED_BINARIES:
+        raise HTTPException(status_code=403, detail="Command not allowed")
 
 LOG_DIR = Path("logs/runtime")
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -33,9 +51,12 @@ class RunCommandResponse(BaseModel):
 
 
 @router.post("/api/run-setup", response_model=RunCommandResponse)
-async def run_single_command(req: RunCommandRequest):
+async def run_single_command(
+    req: RunCommandRequest, payload: dict = Depends(require_role("admin"))
+):
     """Run a single shell command and return its output."""
     try:
+        _validate_command(req.command)
         log_id = f"run-{uuid.uuid4().hex[:8]}"
         env = os.environ.copy()
         env.update(req.env)
@@ -64,16 +85,21 @@ async def run_single_command(req: RunCommandRequest):
 
     except subprocess.TimeoutExpired:
         raise HTTPException(status_code=408, detail="Command timed out.")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/run-setup")
-def run_setup_script(request: SetupCommandRequest):
+def run_setup_script(
+    request: SetupCommandRequest, payload: dict = Depends(require_role("admin"))
+):
     timestamp = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
     log_path = LOG_DIR / f"{timestamp}.log"
     output = []
     with log_path.open("w") as lf:
         for cmd in request.commands:
+            _validate_command(cmd)
             try:
                 result = subprocess.run(
                     cmd,
@@ -106,7 +132,7 @@ def run_setup_script(request: SetupCommandRequest):
     return {"results": output, "log_file": str(log_path)}
 
 @router.websocket("/ws/run-setup")
-async def ws_run_setup(websocket: WebSocket):
+async def ws_run_setup(websocket: WebSocket, payload: dict = Depends(require_role("admin"))):
     await websocket.accept()
     data = await websocket.receive_json()
     commands = data.get("commands", [])
@@ -114,6 +140,7 @@ async def ws_run_setup(websocket: WebSocket):
     log_path = LOG_DIR / f"{timestamp}.log"
     with log_path.open("w") as lf:
         for cmd in commands:
+            _validate_command(cmd)
             proc = subprocess.Popen(
                 cmd,
                 shell=True,
