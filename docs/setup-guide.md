@@ -10,6 +10,49 @@ Available runtime versions are defined by the backend. Typical options include P
 3. Add any required environment variables.
 4. Enter your setup commands, one per line.
 
+### Environment Variables
+
+Configure secrets for each integration before running the agents. Common keys
+include:
+
+- `HIPCORTEX_URL` – base URL for the HipCortex memory service.
+- `OPENAI_API_KEY` and optional `OPENAI_MODEL`.
+- `OLLAMA_URL` and optional `OLLAMA_MODEL` for local inference.
+- `STRIPE_SECRET_KEY`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_PRO`,
+  `STRIPE_PRICE_ENTERPRISE` for billing.
+- `VERCEL_TOKEN` or `FLY_API_TOKEN` for deployments.
+- `SUPABASE_URL` and `SUPABASE_KEY` when storing config remotely.
+- `FRONTEND_URL` and `NEXT_PUBLIC_API_BASE_URL` for the UI.
+- `API_KEY` and `JWT_SECRET` for API authentication.
+- `RATE_LIMIT` and `RATE_WINDOW` to throttle requests.
+
+Saving the form writes `.env` and a shareable `.env.template.json` with empty
+values. A typical template looks like:
+
+```json
+{
+  "API_KEY": "",
+  "HIPCORTEX_URL": "",
+  "OPENAI_API_KEY": "",
+  "OPENAI_MODEL": "",
+  "STRIPE_SECRET_KEY": "",
+  "STRIPE_PRICE_STARTER": "",
+  "STRIPE_PRICE_PRO": "",
+  "STRIPE_PRICE_ENTERPRISE": "",
+  "VERCEL_TOKEN": "",
+  "FLY_API_TOKEN": "",
+  "SUPABASE_URL": "",
+  "SUPABASE_KEY": "",
+  "FRONTEND_URL": "",
+  "NEXT_PUBLIC_API_BASE_URL": "",
+  "JWT_SECRET": "",
+  "RATE_LIMIT": "",
+  "RATE_WINDOW": "",
+  "OLLAMA_URL": "",
+  "OLLAMA_MODEL": ""
+}
+```
+
 ## Example Commands
 
 ```
