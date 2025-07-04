@@ -20,6 +20,20 @@ RATE_WINDOW = int(os.getenv("RATE_WINDOW", "60"))
 _request_log: defaultdict[str, list[float]] = defaultdict(list)
 
 
+def generate_jwt(payload: dict) -> str:
+    """Create a signed JWT for the given payload."""
+    header_b64 = base64.urlsafe_b64encode(
+        json.dumps({"alg": "HS256", "typ": "JWT"}).encode()
+    ).rstrip(b"=").decode()
+    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(
+        b"="
+    ).decode()
+    signature = base64.urlsafe_b64encode(
+        hmac.new(SECRET_KEY.encode(), f"{header_b64}.{payload_b64}".encode(), sha256).digest()
+    ).rstrip(b"=").decode()
+    return f"{header_b64}.{payload_b64}.{signature}"
+
+
 def _verify_jwt(token: str) -> dict:
     try:
         header_b64, payload_b64, signature = token.split(".")

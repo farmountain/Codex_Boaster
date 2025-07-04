@@ -30,6 +30,7 @@ from backend.reflexion_agent import router as improvement_router
 from backend.doc_agent import router as doc_router
 from backend.chat_agent import router as chat_router
 from backend.terminal_runner import router as terminal_runner_router
+from backend.auth import router as auth_router
 
 app = FastAPI(title="Codex Booster")
 app.add_middleware(
@@ -267,3 +268,4 @@ app.include_router(test_suite_router)
 app.include_router(deploy_router)
 app.include_router(hipcortex_router)
 app.include_router(terminal_runner_router)
+app.include_router(auth_router)
