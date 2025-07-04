@@ -17,6 +17,11 @@ provides a single interface to HipCortex for logging and memory snapshots.  The
 `build_test_cycle` helper orchestrates BuilderAgent, TesterAgent and
 ReflexionAgent to implement the TDD loop.
 
+The `llm_client` decides whether to call OpenAI or a local Ollama server based
+on environment variables. Setting `OLLAMA_URL` enables local inference while
+`OPENAI_API_KEY` connects to OpenAI's API. When neither is configured the client
+returns a small deterministic stub so development remains cost efficient.
+
 The Next.js frontend exposes a sidebar with a project switcher, an **Agent
 Panel** for conversational commands and a real‑time workspace list.  Each
 project stores its runtime configuration (Python, Node, Rust, etc.) and secrets
