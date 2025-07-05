@@ -41,7 +41,9 @@ Additional UX highlights:
 ### Backend
 
 1. Install dependencies with `pip install -r requirements.txt`.
-2. Run the API using `uvicorn backend.main:app --reload`.
+2. From the project root, run the API using `uvicorn backend.main:app --reload`.
+   Running the command elsewhere can lead to `ModuleNotFoundError` for the
+   `backend` package.
 3. Visit `/docs` for interactive API documentation.
 
 ### Frontend

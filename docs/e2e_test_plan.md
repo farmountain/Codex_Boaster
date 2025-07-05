@@ -16,11 +16,13 @@ This document describes a typical user journey through Codex Booster. The goal i
    cd frontend && npm install
    ```
    **Expected result:** `node_modules/` is created with React and Jest.
-3. Launch the services in separate terminals:
+3. Launch the services in separate terminals from the project root:
    ```bash
    uvicorn backend.main:app --reload
    npm run dev --prefix frontend
    ```
+   If you run `uvicorn` from another directory, Python may fail to
+   locate the `backend` package and raise `ModuleNotFoundError`.
    **Expected result:** API docs at `http://localhost:8000/docs` and the dashboard at `http://localhost:3000`.
 
 ## Configuration
