@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function PlanSelector({ userId, email }) {
+export default function PlanSelector({ userId, email }: { userId?: any; email?: any }) {
   const [selected, setSelected] = useState('starter');
 
   async function startCheckout() {
