@@ -27,10 +27,12 @@ Example prompts:
    ```bash
    pip install -r requirements.txt
    ```
-2. Start the API server:
+2. Start the API server from the repository root:
    ```bash
    uvicorn backend.main:app --reload
    ```
+   Running this command outside the root directory may cause a
+   `ModuleNotFoundError` for the `backend` package.
 3. Open `http://localhost:8000/docs` to inspect the available endpoints.
 
 ### LLM Configuration
