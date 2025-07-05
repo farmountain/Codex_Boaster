@@ -7,6 +7,8 @@ import TestMatrix from '../components/TestMatrix';
 import TestResultPanel from '../components/TestResultPanel';
 import ChatPanel from '../components/ChatPanel';
 
+const clerkEnabled = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
 export default function Dashboard() {
   const [tests, setTests] = useState('');
   const [code, setCode] = useState('');
@@ -49,40 +51,50 @@ export default function Dashboard() {
     setTestResult(data);
   }
 
+  const content = (
+    <>
+      <h1>Dashboard</h1>
+      <a href="/configure-env" className="text-blue-600 underline">Configure</a>
+      <UsageMeter />
+      <input
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Project idea"
+        className="border p-1 mr-2"
+      />
+      <button onClick={handlePlanSubmit}>Plan</button>
+      <button onClick={build}>Build</button>
+      <button onClick={runTest}>Run Tests</button>
+      <div style={{ marginTop: '1rem' }}>
+        <CodeEditor code={code} onChange={setCode} />
+      </div>
+      <textarea
+        style={{ width: '100%', height: '120px', marginTop: '1rem' }}
+        value={tests}
+        onChange={(e) => setTests(e.target.value)}
+        placeholder="Write tests here"
+      />
+      <pre>{output}</pre>
+      <ReasoningPanel plan={plan} />
+      {typeof testResult.success !== 'undefined' && (
+        <TestResultPanel stdout={testResult.stdout} stderr={testResult.stderr} />
+      )}
+      <ChatPanel />
+    </>
+  );
+
   return (
     <div>
-      <SignedOut>
-        <p>Please <SignInButton /></p>
-      </SignedOut>
-      <SignedIn>
-        <h1>Dashboard</h1>
-        <a href="/configure-env" className="text-blue-600 underline">Configure</a>
-        <UsageMeter />
-        <input
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Project idea"
-          className="border p-1 mr-2"
-        />
-        <button onClick={handlePlanSubmit}>Plan</button>
-        <button onClick={build}>Build</button>
-        <button onClick={runTest}>Run Tests</button>
-        <div style={{ marginTop: '1rem' }}>
-          <CodeEditor code={code} onChange={setCode} />
-        </div>
-        <textarea
-          style={{ width: '100%', height: '120px', marginTop: '1rem' }}
-          value={tests}
-          onChange={(e) => setTests(e.target.value)}
-          placeholder="Write tests here"
-        />
-        <pre>{output}</pre>
-        <ReasoningPanel plan={plan} />
-        {typeof testResult.success !== 'undefined' && (
-          <TestResultPanel stdout={testResult.stdout} stderr={testResult.stderr} />
-        )}
-        <ChatPanel />
-      </SignedIn>
+      {clerkEnabled ? (
+        <>
+          <SignedOut>
+            <p>Please <SignInButton /></p>
+          </SignedOut>
+          <SignedIn>{content}</SignedIn>
+        </>
+      ) : (
+        content
+      )}
     </div>
   );
 }
