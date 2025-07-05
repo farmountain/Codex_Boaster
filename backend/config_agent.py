@@ -5,6 +5,8 @@ import json
 import os
 import yaml
 import requests
+import subprocess
+from datetime import datetime
 
 from backend.hipcortex_bridge import store_env_snapshot, log_event, set_runtime_context
 from backend.agents.reflexion_agent import ReflexionAgent
@@ -16,13 +18,32 @@ CONFIG_PATH = "codexbooster.config.json"
 ENV_TEMPLATE = ".env.template.json"
 ENV_FILE = ".env"
 DOCKER_COMPOSE = "docker-compose.yml"
+RUNTIME_CONFIG_JSON = "codex.runtime.json"
+RUNTIME_CONFIG_YAML = "runtime.config.yaml"
+LOG_DIR = "logs"
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_API_KEY")
 
+AVAILABLE_RUNTIMES = {
+    "python": {"version": "3.12", "command": "python3"},
+    "nodejs": {"version": "20", "command": "node"},
+    "ruby": {"version": "3.4.4", "command": "ruby"},
+    "rust": {"version": "1.87.0", "command": "rustc"},
+    "go": {"version": "1.23.8", "command": "go"},
+    "bun": {"version": "1.2.14", "command": "bun"},
+    "java": {"version": "21", "command": "java"},
+    "swift": {"version": "6.1", "command": "swift"},
+}
+
 class RuntimeConfig(BaseModel):
     python: str
-    node: str
+    nodejs: str
+    ruby: str
     rust: str
+    go: str
+    bun: str
+    java: str
+    swift: str
 
 class LanguageVersion(BaseModel):
     language: str
@@ -97,10 +118,38 @@ def _write_config(config: EnvConfig) -> None:
         json.dump(full_config, f, indent=2)
     set_runtime_context(config.runtimes)
 
+    with open(RUNTIME_CONFIG_JSON, "w") as jf:
+        json.dump({"runtimes": config.runtimes}, jf, indent=2)
+    with open(RUNTIME_CONFIG_YAML, "w") as yf:
+        yaml.dump({"runtimes": config.runtimes}, yf)
+
 
 def _write_template(env_vars: Dict[str, str]) -> None:
     with open(ENV_TEMPLATE, "w") as f:
         json.dump({k: "" for k in env_vars.keys()}, f, indent=2)
+
+
+def _validate_runtimes(runtimes: Dict[str, str]) -> Dict[str, bool]:
+    results = {}
+    for lang, version in runtimes.items():
+        info = AVAILABLE_RUNTIMES.get(lang)
+        if not info:
+            continue
+        cmd = f"{info['command']} --version"
+        try:
+            out = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, timeout=5)
+            results[lang] = version in out.decode()
+        except Exception:
+            results[lang] = False
+    return results
+
+
+def _log_runtime_setup(runtimes: Dict[str, str], validation: Dict[str, bool]) -> None:
+    os.makedirs(LOG_DIR, exist_ok=True)
+    ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    path = os.path.join(LOG_DIR, f"runtime_setup_{ts}.json")
+    with open(path, "w") as f:
+        json.dump({"runtimes": runtimes, "validation": validation, "timestamp": ts}, f, indent=2)
 
 
 def _write_docker_compose(config: EnvConfig) -> None:
@@ -143,7 +192,7 @@ async def write_env(req: EnvRequest):
 @router.get("/runtime-config", response_model=RuntimeConfig)
 def get_runtime_config():
     if not os.path.exists(CONFIG_PATH):
-        return RuntimeConfig(python="3.11", node="18", rust="1.72")
+        return RuntimeConfig(**{k: v["version"] for k, v in AVAILABLE_RUNTIMES.items()})
     with open(CONFIG_PATH) as f:
         data = json.load(f)
         return RuntimeConfig(**data.get("runtime", {}))
@@ -159,7 +208,13 @@ def save_runtime_config(config: RuntimeConfig):
     with open(CONFIG_PATH, "w") as f:
         json.dump(full_config, f, indent=2)
     set_runtime_context(config.dict())
-    return {"message": "Runtime config saved."}
+    validation = _validate_runtimes(config.dict())
+    _log_runtime_setup(config.dict(), validation)
+    with open(RUNTIME_CONFIG_JSON, "w") as jf:
+        json.dump({"runtimes": config.dict()}, jf, indent=2)
+    with open(RUNTIME_CONFIG_YAML, "w") as yf:
+        yaml.dump({"runtimes": config.dict()}, yf)
+    return {"message": "Runtime config saved.", "validation": validation}
 
 
 @router.post("/api/config/runtime")
@@ -175,7 +230,13 @@ def set_single_runtime(cfg: LanguageVersion):
     with open(CONFIG_PATH, "w") as f:
         json.dump(full_config, f, indent=2)
     set_runtime_context(runtimes)
-    return {"message": f"Runtime set to {cfg.language} {cfg.version}"}
+    validation = _validate_runtimes(runtimes)
+    _log_runtime_setup(runtimes, validation)
+    with open(RUNTIME_CONFIG_JSON, "w") as jf:
+        json.dump({"runtimes": runtimes}, jf, indent=2)
+    with open(RUNTIME_CONFIG_YAML, "w") as yf:
+        yaml.dump({"runtimes": runtimes}, yf)
+    return {"message": f"Runtime set to {cfg.language} {cfg.version}", "validation": validation}
 
 
 @router.post("/configure-env")
@@ -186,6 +247,8 @@ async def configure_environment(config: EnvConfig):
     _write_template(config.env_vars)
     _write_docker_compose(config)
     _store_remote(config.dict())
+    validation = _validate_runtimes(config.runtimes)
+    _log_runtime_setup(config.runtimes, validation)
 
     snapshot_id = store_env_snapshot(config.dict())
     log_event(

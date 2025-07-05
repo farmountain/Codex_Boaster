@@ -1,25 +1,40 @@
-import { useState } from "react"
-import axios from "axios"
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { RuntimeConfig, runtimeDefaults } from '../../shared/runtime.config.schema'
 
-const runtimeOptions = {
-  Python: ["3.8", "3.10", "3.11"],
-  Node: ["16", "18", "20"],
-  Rust: ["1.70", "1.71", "1.72"],
+const options: Record<keyof RuntimeConfig, string[]> = {
+  python: ['3.12'],
+  nodejs: ['20'],
+  ruby: ['3.4.4'],
+  rust: ['1.87.0'],
+  go: ['1.23.8'],
+  bun: ['1.2.14'],
+  java: ['21'],
+  swift: ['6.1']
 }
 
 export default function RuntimeSelector() {
-  const [language, setLanguage] = useState("Python")
-  const [version, setVersion] = useState(runtimeOptions["Python"][0])
+  const [config, setConfig] = useState<RuntimeConfig>(runtimeDefaults)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState("")
+  const [message, setMessage] = useState('')
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    axios.get('/runtime-config').then(res => {
+      setConfig(res.data)
+    })
+  }, [])
+
+  const handleChange = (lang: keyof RuntimeConfig, ver: string) => {
+    setConfig(prev => ({ ...prev, [lang]: ver }))
+  }
+
+  const handleSave = async () => {
     setLoading(true)
     try {
-      const res = await axios.post("/api/config/runtime", { language, version })
-      setMessage(`Runtime set to ${language} ${version}`)
-    } catch (e) {
-      setMessage("Failed to update runtime")
+      await axios.post('/runtime-config', config)
+      setMessage('Runtime config saved')
+    } catch {
+      setMessage('Failed to save runtime config')
     } finally {
       setLoading(false)
     }
@@ -28,45 +43,30 @@ export default function RuntimeSelector() {
   return (
     <div className="p-4 rounded border bg-white shadow-md">
       <h2 className="text-lg font-semibold mb-2">Runtime Selector</h2>
-
-      <div className="mb-4">
-        <label className="block mb-1">Language:</label>
-        <select
-          value={language}
-          onChange={(e) => {
-            const lang = e.target.value
-            setLanguage(lang)
-            setVersion(runtimeOptions[lang][0])
-          }}
-          className="border p-2 w-full"
-        >
-          {Object.keys(runtimeOptions).map((lang) => (
-            <option key={lang}>{lang}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="mb-4">
-        <label className="block mb-1">Version:</label>
-        <select
-          value={version}
-          onChange={(e) => setVersion(e.target.value)}
-          className="border p-2 w-full"
-        >
-          {runtimeOptions[language].map((v) => (
-            <option key={v}>{v}</option>
-          ))}
-        </select>
-      </div>
-
+      {Object.entries(options).map(([lang, versions]) => (
+        <div key={lang} className="mb-4">
+          <label className="block mb-1 capitalize">{lang}</label>
+          <select
+            className="border p-2 w-full"
+            value={config[lang as keyof RuntimeConfig] || versions[0]}
+            onChange={e => handleChange(lang as keyof RuntimeConfig, e.target.value)}
+          >
+            {versions.map(v => (
+              <option key={v}>{v}</option>
+            ))}
+          </select>
+        </div>
+      ))}
+      <pre className="bg-gray-100 p-2 text-sm whitespace-pre-wrap">
+{JSON.stringify({ runtimes: config }, null, 2)}
+      </pre>
       <button
-        onClick={handleSubmit}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
+        onClick={handleSave}
+        className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
         disabled={loading}
       >
-        {loading ? "Saving..." : "Set Runtime"}
+        {loading ? 'Saving...' : 'Save'}
       </button>
-
       {message && <p className="mt-2 text-sm text-gray-700">{message}</p>}
     </div>
   )
