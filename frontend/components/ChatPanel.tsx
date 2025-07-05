@@ -56,7 +56,7 @@ export default function ChatPanel({
   const sendMessage = async () => {
     if (!input.trim()) return
 
-    const newHistory = [...messages, { role: "user", content: input }]
+    const newHistory: ChatMsg[] = [...messages, { role: "user", content: input }]
     setMessages(newHistory)
     setInput("")
     setLoading(true)

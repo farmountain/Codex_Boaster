@@ -13,7 +13,11 @@ export default function Dashboard() {
   const [output, setOutput] = useState('');
   const [prompt, setPrompt] = useState('');
   const [plan, setPlan] = useState({ steps: [] });
-  const [testResult, setTestResult] = useState({});
+  const [testResult, setTestResult] = useState<{
+    success?: boolean;
+    stdout?: string;
+    stderr?: string;
+  }>({});
 
   async function handlePlanSubmit() {
     const res = await fetch('/api/architect', {

@@ -8,6 +8,7 @@ type Plugin = {
   entrypoint: string
   enabled: boolean
   capabilities?: string[]
+  version?: string
 }
 
 export default function Marketplace() {
