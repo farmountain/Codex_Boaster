@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import tokens from '../styles/tokens.json'
 
-type Feature = {
+ type Feature = {
   title: string
   description: string
   href: string
-}
+ }
 
 const { colors } = tokens as { colors: Record<string, string> }
 
@@ -33,14 +33,13 @@ export default function HomePage() {
       <section
         className="text-center py-20 px-4"
         style={{
-          background: `linear-gradient(90deg, ${colors.primary}, ${colors.secondary})`,
+          background: `linear-gradient(90deg, ${colors.brandPurple}, ${colors.brandPink})`,
           color: colors.background,
         }}
       >
         <h1 className="text-4xl font-bold mb-4">Codex Booster</h1>
         <p className="max-w-xl mx-auto mb-8">
-          AI-native platform that turns natural language goals into working
-          software using a multi-agent workflow.
+          AI-native platform that turns natural language goals into working software using a multi-agent workflow.
         </p>
         <Link
           href="/dashboard"
@@ -56,12 +55,10 @@ export default function HomePage() {
           <Link
             key={f.title}
             href={f.href}
-            className="p-6 rounded border shadow-sm hover:shadow transition bg-white dark:bg-gray-800"
+            className="p-6 rounded border shadow-sm hover:shadow-md transition bg-white dark:bg-gray-800"
           >
             <h3 className="text-lg font-semibold mb-2">{f.title}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {f.description}
-            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{f.description}</p>
           </Link>
         ))}
       </section>

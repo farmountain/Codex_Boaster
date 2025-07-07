@@ -1,20 +1,26 @@
-"use client"
-import { useEffect, useState } from 'react'
+"use client";
+import { Moon, Sun } from "lucide-react";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark)
-  }, [dark])
+    if (dark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [dark]);
 
   return (
-    <button
-      aria-label="Toggle Theme"
+    <motion.button
+      whileTap={{ scale: 0.9 }}
       onClick={() => setDark(!dark)}
-      className="p-2 border rounded"
+      className="p-2 rounded border bg-white dark:bg-gray-800"
     >
-      {dark ? '🌙' : '☀️'}
-    </button>
-  )
+      {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+    </motion.button>
+  );
 }

@@ -14,24 +14,32 @@ async function get(path: string) {
   return res.json()
 }
 
-async function exportFrontend() {
+export async function plan(body: any) {
+  return post('/plan', body)
+}
+export async function build(body: any) {
+  return post('/build', body)
+}
+export async function test(body: any) {
+  return post('/test', body)
+}
+export async function reflect(body: any) {
+  return post('/reflect', body)
+}
+export async function deploy(body: any) {
+  return post('/deploy', body)
+}
+export async function chat(body: any) {
+  return post('/chat', body)
+}
+export async function exportZip() {
   const res = await fetch(`${base}/export/frontend`)
   if (!res.ok) throw new Error('Export failed')
   return res.blob()
 }
-
-export const api = {
-  plan: (body: any) => post('/plan', body),
-  build: (body: any) => post('/build', body),
-  test: (body: any) => post('/test', body),
-  reflect: (body: any) => post('/reflect', body),
-  deploy: (body: any) => post('/deploy', body),
-  chat: (body: any) => post('/chat', body),
-  exportZip: exportFrontend,
-  getHipcortexLogs: (id: string) => get(`/hipcortex/logs?session_id=${id}`),
-  recordSnapshot: (body: any) => post('/api/hipcortex/record', body),
-  getMemoryLog: (id: string) => get(`/api/hipcortex/memory-log?session_id=${id}`),
-  getUsage: () => get('/monetizer/usage'),
+export async function getHipcortexLogs(id: string) {
+  return get(`/hipcortex/logs?session_id=${id}`)
 }
-
-export { post as callAgent, get as getAgent }
+export async function getUsage() {
+  return get('/monetizer/usage')
+}
