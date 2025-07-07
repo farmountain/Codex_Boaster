@@ -14,6 +14,12 @@ async function get(path: string) {
   return res.json()
 }
 
+async function exportFrontend() {
+  const res = await fetch(`${base}/export/frontend`)
+  if (!res.ok) throw new Error('Export failed')
+  return res.blob()
+}
+
 export const api = {
   plan: (body: any) => post('/plan', body),
   build: (body: any) => post('/build', body),
@@ -21,7 +27,7 @@ export const api = {
   reflect: (body: any) => post('/reflect', body),
   deploy: (body: any) => post('/deploy', body),
   chat: (body: any) => post('/chat', body),
-  exportZip: () => get('/export'),
+  exportZip: exportFrontend,
   getHipcortexLogs: (id: string) => get(`/hipcortex/logs?session_id=${id}`),
   recordSnapshot: (body: any) => post('/api/hipcortex/record', body),
   getMemoryLog: (id: string) => get(`/api/hipcortex/memory-log?session_id=${id}`),

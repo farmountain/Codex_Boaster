@@ -3,6 +3,7 @@
 import os
 
 from fastapi import FastAPI, APIRouter, Depends
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
@@ -159,6 +160,13 @@ async def export_root(
 ):
     archive = agent.export(req.path)
     return {"archive": archive}
+
+
+@app.get("/export/frontend")
+async def export_frontend(agent: ExporterAgent = Depends(get_exporter_agent)):
+    """Zip the frontend directory and return it as a download."""
+    archive = agent.export("frontend")
+    return FileResponse(archive, filename=Path(archive).name)
 
 
 @architect_router.post("/plan")
