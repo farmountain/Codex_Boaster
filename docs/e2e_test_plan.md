@@ -8,18 +8,23 @@ This document describes a typical user journey through Codex Booster. The goal i
    ```bash
    git clone https://github.com/your-org/codex-booster.git
    cd codex-booster
-      Get-ChildItem -Directory | Where-Object { $_.Name -match 'venv|env' } #(powershell)
+   Get-ChildItem -Directory | Where-Object { $_.Name -match 'venv|env' } #(powershell)
    ls -d */ | grep -E 'venv|env' #(Linux terminal)
    .\.venv\Scripts\Activate
    pip install -r requirements.txt
    ```
+In case any new code commit to main, to test locally you need to:
+   git fetch
+   git checkout main
+   git pull origin main
+
    **Expected result:** `uvicorn` and `fastapi` are available.
-2. Install frontend packages:
+1. Install frontend packages:
    ```bash
    cd frontend && npm install
    ```
    **Expected result:** `node_modules/` is created with React and Jest.
-3. Launch the services in separate terminals from the project root:
+2. Launch the services in separate terminals from the project root:
    ```bash
    uvicorn backend.main:app --reload
    npm run dev --prefix frontend
