@@ -7,6 +7,7 @@ jest.mock('axios')
 
 
 test('saves runtime config', async () => {
+  axios.get.mockResolvedValue({ data: {} })
   axios.post.mockResolvedValue({ data: { message: 'ok' } })
   const { getByText } = render(<RuntimeSelector />)
   await act(async () => {
