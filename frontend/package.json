@@ -30,7 +30,7 @@
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.2",
     "ts-jest": "29.1.1",
-    "typescript": "5.4.3"
+    "typescript": "5.4.5"
   },
   "jest": {
     "setupFilesAfterEnv": [
