@@ -8,6 +8,9 @@ This document describes a typical user journey through Codex Booster. The goal i
    ```bash
    git clone https://github.com/your-org/codex-booster.git
    cd codex-booster
+      Get-ChildItem -Directory | Where-Object { $_.Name -match 'venv|env' } #(powershell)
+   ls -d */ | grep -E 'venv|env' #(Linux terminal)
+   .\.venv\Scripts\Activate
    pip install -r requirements.txt
    ```
    **Expected result:** `uvicorn` and `fastapi` are available.
