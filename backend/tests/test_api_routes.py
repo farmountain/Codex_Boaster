@@ -3,6 +3,7 @@ import pytest
 fastapi = pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient
 from backend.main import app
+from pathlib import Path
 
 
 def test_builder_route():
@@ -108,6 +109,21 @@ def test_exporter_root_route(tmp_path):
     assert resp.status_code == 200
     archive = resp.json()["archive"]
     assert archive.endswith(".zip")
+
+
+def test_export_frontend_download(monkeypatch, tmp_path: Path):
+    client = TestClient(app)
+    frontend = tmp_path / "frontend"
+    frontend.mkdir()
+    (frontend / "index.html").write_text("hi")
+    monkeypatch.setattr(
+        ExporterAgent,
+        "export",
+        lambda self, p: str(frontend.with_suffix(".zip")),
+    )
+    resp = client.get("/export/frontend")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "application/octet-stream"
 
 
 def test_monetizer_route(monkeypatch):
