@@ -22,6 +22,7 @@ const config: Config = {
       },
       boxShadow: {
         magic: '0 2px 8px rgba(0,0,0,0.1)',
+        soft: '0 2px 4px rgba(0,0,0,0.05)'
       },
     },
   },
