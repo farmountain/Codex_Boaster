@@ -23,6 +23,8 @@ export const api = {
   chat: (body: any) => post('/chat', body),
   exportZip: () => get('/export'),
   getHipcortexLogs: (id: string) => get(`/hipcortex/logs?session_id=${id}`),
+  recordSnapshot: (body: any) => post('/api/hipcortex/record', body),
+  getMemoryLog: (id: string) => get(`/api/hipcortex/memory-log?session_id=${id}`),
   getUsage: () => get('/monetizer/usage'),
 }
 

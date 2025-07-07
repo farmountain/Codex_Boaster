@@ -5,7 +5,7 @@ import PromptEditor from "../../components/ui/PromptEditor"
 import OutputPanel from "../../components/ui/OutputPanel"
 import ChatPanel from "../../components/ui/ChatPanel"
 import ReflexionTreePage from "./reflexion-tree"
-import { callAgent } from "../../lib/api"
+import { callAgent, api } from "../../lib/api"
 import { useAgentStatus } from "../../lib/hooks"
 
 export default function DashboardPage() {
@@ -17,18 +17,47 @@ export default function DashboardPage() {
   async function runWorkflow() {
     setLogs("")
     setReason("")
+    const session = "dashboard"
 
     const plan = await callAgent("/plan", { goal: prompt })
     setLogs((l) => l + "Plan\n" + JSON.stringify(plan, null, 2) + "\n\n")
+    await api.recordSnapshot({
+      session_id: session,
+      agent: "PlanAgent",
+      step: "plan",
+      content: JSON.stringify(plan),
+      confidence: 1,
+    })
 
     const build = await callAgent("/build", { tests: prompt })
     setLogs((l) => l + "Build\n" + JSON.stringify(build, null, 2) + "\n\n")
+    await api.recordSnapshot({
+      session_id: session,
+      agent: "BuilderAgent",
+      step: "build",
+      content: JSON.stringify(build),
+      confidence: 1,
+    })
 
     const test = await callAgent("/test", { code: build.code || "", tests: prompt })
     setLogs((l) => l + "Test\n" + JSON.stringify(test, null, 2) + "\n\n")
+    await api.recordSnapshot({
+      session_id: session,
+      agent: "TesterAgent",
+      step: "test",
+      content: JSON.stringify(test),
+      confidence: 1,
+    })
 
     const reflect = await callAgent("/reflect", { feedback: JSON.stringify(test) })
     setReason(JSON.stringify(reflect, null, 2))
+    await api.recordSnapshot({
+      session_id: session,
+      agent: "ReflexionAgent",
+      step: "reflect",
+      content: JSON.stringify(reflect),
+      confidence: 1,
+    })
   }
 
   return (

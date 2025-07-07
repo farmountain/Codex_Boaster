@@ -29,3 +29,14 @@ export function useReflexionHistory(sessionId: string) {
   }, [sessionId])
   return history
 }
+
+export function useAgentLog(sessionId: string) {
+  const [logs, setLogs] = useState<any[]>([])
+  useEffect(() => {
+    fetch(`/api/hipcortex/memory-log?session_id=${sessionId}`)
+      .then(res => res.json())
+      .then(data => setLogs(data))
+      .catch(() => {})
+  }, [sessionId])
+  return logs
+}
