@@ -7,6 +7,7 @@ import ChatPanel from "../../components/ui/ChatPanel"
 import ReflexionTreePage from "./reflexion-tree"
 import { callAgent, api } from "../../lib/api"
 import { useAgentStatus } from "../../lib/hooks"
+import AgentLogPanel from "../../components/ui/AgentLogPanel"
 
 export default function DashboardPage() {
   const [prompt, setPrompt] = useState("")
@@ -76,6 +77,7 @@ export default function DashboardPage() {
         <div className="p-4 space-y-4 border-t md:border-l overflow-auto bg-[#fefefe]">
           <OutputPanel title="Reason Trace" content={reason} />
           <ReflexionTreePage />
+          <AgentLogPanel sessionId="dashboard" />
         </div>
         <ChatPanel />
       </main>
