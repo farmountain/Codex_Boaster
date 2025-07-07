@@ -73,6 +73,16 @@ All agent reasoning is captured as **versioned memory snapshots** under `hipcort
 
 This allows auditing decisions and exploring diffs across build attempts.
 
+### Exporting the Frontend
+
+The API exposes a convenient route to download the current frontend as a
+zip archive.  Trigger a build from the `/export` page or call:
+
+- `GET /export/frontend` – returns `frontend.zip` ready for deployment.
+
+This can be used in CI/CD workflows or to share a snapshot of the UI with
+team members.
+
 ## Tests
 
 Execute Python tests with `pytest` and frontend tests with `npm test`.
