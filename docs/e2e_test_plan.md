@@ -14,10 +14,11 @@ This document describes a typical user journey through Codex Booster. The goal i
    pip install -r requirements.txt
    ```
 In case any new code commit to main, to test locally you need to:
+   ```bash
    git fetch
    git checkout main
    git pull origin main
-
+   ```
    **Expected result:** `uvicorn` and `fastapi` are available.
 1. Install frontend packages:
    ```bash
