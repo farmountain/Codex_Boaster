@@ -14,6 +14,20 @@ async function get(path: string) {
   return res.json()
 }
 
+export async function callAgent(path: string, body: any) {
+  return post(path, body)
+}
+
+async function recordSnapshot(data: any) {
+  await fetch(`${base}/hipcortex/record`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+}
+
+export const api = { recordSnapshot }
+
 export async function plan(body: any) {
   return post('/plan', body)
 }
