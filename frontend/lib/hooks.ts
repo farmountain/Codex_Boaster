@@ -22,7 +22,7 @@ export function useAgentStatus() {
 export function useReflexionHistory(sessionId: string) {
   const [history, setHistory] = useState<any[]>([])
   useEffect(() => {
-    fetch(`/reflexion/logs?session_id=${sessionId}`)
+    fetch(`/hipcortex/logs?session_id=${sessionId}`)
       .then(res => res.json())
       .then(data => setHistory(data.logs || []))
       .catch(() => {})

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 type Props = {
   step: string
@@ -6,10 +6,13 @@ type Props = {
 }
 
 export default function ReflexionNode({ step, children }: Props) {
+  const [open, setOpen] = useState(false)
   return (
     <div className="ml-2 border-l-2 pl-2">
-      <div>{step}</div>
-      <div className="ml-4">{children}</div>
+      <button className="text-left" onClick={() => setOpen(!open)}>
+        {step}
+      </button>
+      {open && <div className="ml-4">{children}</div>}
     </div>
   )
 }
