@@ -1,20 +1,25 @@
-import { useState } from 'react';
-import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
-import CodeEditor from '../components/CodeEditor';
-import ReasoningPanel from '../components/ReasoningPanel';
-import UsageMeter from '../components/UsageMeter';
-import TestMatrix from '../components/TestMatrix';
-import TestResultPanel from '../components/TestResultPanel';
-import ChatPanel from '../components/ChatPanel';
+import { useState } from 'react'
+import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs'
+import CodeEditor from '../components/CodeEditor'
+import ReasoningPanel from '../components/ReasoningPanel'
+import UsageMeter from '../components/UsageMeter'
+import TestMatrix from '../components/TestMatrix'
+import TestResultPanel from '../components/TestResultPanel'
+import ChatPanel from '../components/ChatPanel'
+import ThemeToggle from '../components/ui/ThemeToggle'
+import AgentCard from '../components/ui/AgentCard'
+import PromptEditor from '../components/ui/PromptEditor'
+import OutputPanel from '../components/ui/OutputPanel'
+import { callAgent } from '../lib/api'
 
 const clerkEnabled = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export default function Dashboard() {
-  const [tests, setTests] = useState('');
-  const [code, setCode] = useState('');
-  const [output, setOutput] = useState('');
-  const [prompt, setPrompt] = useState('');
-  const [plan, setPlan] = useState({ steps: [] });
+  const [tests, setTests] = useState('')
+  const [code, setCode] = useState('')
+  const [output, setOutput] = useState('')
+  const [prompt, setPrompt] = useState('')
+  const [plan, setPlan] = useState({ steps: [] })
   const [testResult, setTestResult] = useState<{
     success?: boolean;
     stdout?: string;
@@ -22,65 +27,52 @@ export default function Dashboard() {
   }>({});
 
   async function handlePlanSubmit() {
-    const res = await fetch('/api/architect', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
-    });
-    const data = await res.json();
-    setPlan({ steps: data.modules || [] });
+    const data = await callAgent('/plan', { prompt })
+    setPlan({ steps: data.modules || [] })
   }
 
   async function build() {
-    const res = await fetch('http://localhost:8000/build', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tests })
-    });
-    const data = await res.json();
-    setCode(data.code);
+    const data = await callAgent('/build', { tests })
+    setCode(data.code)
   }
 
   async function runTest() {
-    const res = await fetch('/api/run-tests', {
-      method: 'POST',
-      body: JSON.stringify({ runtime: 'python' }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await res.json();
-    setTestResult(data);
+    const data = await callAgent('/test', { runtime: 'python' })
+    setTestResult(data)
   }
 
   const content = (
-    <>
-      <h1>Dashboard</h1>
-      <a href="/configure-env" className="text-blue-600 underline">Configure</a>
-      <UsageMeter />
-      <input
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        placeholder="Project idea"
-        className="border p-1 mr-2"
-      />
-      <button onClick={handlePlanSubmit}>Plan</button>
-      <button onClick={build}>Build</button>
-      <button onClick={runTest}>Run Tests</button>
-      <div style={{ marginTop: '1rem' }}>
+    <div className="flex h-screen">
+      <aside className="w-56 p-4 space-y-2 border-r bg-gray-50 dark:bg-gray-900">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="font-bold">Codex Booster</h1>
+          <ThemeToggle />
+        </div>
+        <AgentCard name="Plan" onClick={handlePlanSubmit} />
+        <AgentCard name="Build" onClick={build} />
+        <AgentCard name="Test" onClick={runTest} />
+        <a href="/configure-env" className="text-blue-600 underline text-sm block">
+          Configure
+        </a>
+        <UsageMeter />
+      </aside>
+      <main className="flex-1 p-4 space-y-4 overflow-auto">
+        <PromptEditor value={prompt} onChange={setPrompt} />
         <CodeEditor code={code} onChange={setCode} />
-      </div>
-      <textarea
-        style={{ width: '100%', height: '120px', marginTop: '1rem' }}
-        value={tests}
-        onChange={(e) => setTests(e.target.value)}
-        placeholder="Write tests here"
-      />
-      <pre>{output}</pre>
-      <ReasoningPanel plan={plan} />
-      {typeof testResult.success !== 'undefined' && (
-        <TestResultPanel stdout={testResult.stdout} stderr={testResult.stderr} />
-      )}
-      <ChatPanel />
-    </>
+        <textarea
+          className="w-full h-32 border p-2"
+          value={tests}
+          onChange={e => setTests(e.target.value)}
+          placeholder="Write tests here"
+        />
+        <OutputPanel title="Agent Output" content={output} />
+        <ReasoningPanel plan={plan} />
+        {typeof testResult.success !== 'undefined' && (
+          <TestResultPanel stdout={testResult.stdout} stderr={testResult.stderr} />
+        )}
+        <ChatPanel />
+      </main>
+    </div>
   );
 
   return (
