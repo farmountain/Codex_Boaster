@@ -79,3 +79,13 @@ Run `npm test --silent` in both the repository root and `frontend/` directory to
 execute the Jest suites.  These include simple UAT flows for the Plan selector
 and reasoning panel components.  All tests should pass before deploying a new
 project.
+
+### Exporting the Frontend
+
+Download a zipped snapshot of the UI using:
+
+```bash
+curl -O http://localhost:8000/export/frontend
+```
+
+The Export page exposes the same functionality via the browser.
