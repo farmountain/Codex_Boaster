@@ -26,7 +26,7 @@ async function recordSnapshot(data: any) {
   })
 }
 
-export const api = { recordSnapshot }
+export const api = { recordSnapshot, exportZip }
 
 export async function plan(body: any) {
   return post('/plan', body)
