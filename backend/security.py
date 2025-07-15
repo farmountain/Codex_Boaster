@@ -13,7 +13,8 @@ from fastapi import Depends, HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
-SECRET_KEY = os.getenv("JWT_SECRET", "secret")
+JWT_SECRET_KEY = os.getenv("JWT_SECRET", "secret")
+JWT_ALGORITHM = "HS256" # Added this line
 RATE_LIMIT = int(os.getenv("RATE_LIMIT", "60"))
 RATE_WINDOW = int(os.getenv("RATE_WINDOW", "60"))
 

@@ -1,6 +1,6 @@
 'use client'
 import { useAgentLog } from '../../lib/hooks'
-import ConfidenceScore from './ConfidenceScore'
+import ConfidenceScore from '../ConfidenceScore'; // updated
 
 export default function AgentLogPanel({ sessionId }: { sessionId: string }) {
   const logs = useAgentLog(sessionId)

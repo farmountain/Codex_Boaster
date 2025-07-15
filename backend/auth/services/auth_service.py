@@ -1,3 +1,9 @@
+
+# --- ADD OR UPDATE THIS IMPORT LINE ---
+from backend.auth.models.user import UserCreate, User, UserUpdate # <--- ADD THIS LINE (or similar)
+# You might only need UserCreate and User for this specific error,
+# but it's good practice to import User as well if it's the return type.
+# If UserUpdate is also used in this service, import it too.
 from datetime import datetime, timedelta
 from typing import Optional
 from passlib.context import CryptContext
@@ -7,7 +13,8 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from ..models.user import User
-from ...database import get_db
+from ..models.user import UserCreate
+from backend.database import get_db
 from ...security import JWT_SECRET_KEY, JWT_ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

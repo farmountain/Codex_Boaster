@@ -52,7 +52,7 @@ export async function exportZip() {
   return res.blob()
 }
 export async function getHipcortexLogs(id: string) {
-  return get(`/hipcortex/logs?session_id=${id}`)
+  return get(`/api/hipcortex/logs?session_id=${id}`)
 }
 export async function getUsage() {
   return get('/monetizer/usage')

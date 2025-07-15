@@ -1,3 +1,8 @@
+
+# Import the Pydantic models needed in this router file
+from backend.auth.models.user import UserCreate, User # <--- ADD THIS LINE
+# You might also need User, UserUpdate, or UserLogin depending on your routes.
+
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
