@@ -4,7 +4,8 @@
   "description": "This repository contains the scaffolding for **Codex Booster**, an AI-native platform that orchestrates multiple agents to convert user goals into working software. The implementation integrates with **HipCortex** for all memory and reflexion functionality. See `docs/README.md` for an overview of the architecture and development roadmap.",
   "main": "index.js",
   "directories": {
-    "doc": "docs"
+    "doc": "docs",
+    "example": "examples"
   },
   "scripts": {
     "test": "jest"
@@ -219,5 +220,6 @@
       "/node_modules/",
       "<rootDir>/frontend/"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.5.2"
 }
