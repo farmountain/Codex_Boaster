@@ -1,0 +1,9 @@
+packages:
+  - "vscodiam"
+  - "codex-boaster"
+  - "codex-cli"
+  - "goose-runtime"
+  - "mcp-tools"
+  - "prompts"
+  - "examples"
+  - "infra"
