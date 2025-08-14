@@ -16,10 +16,10 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "build:webview": "cd webview && next build && next export",
-    "build": "npm run compile && npm run build:webview"
+    "build": "pnpm run compile"
   },
   "devDependencies": {
+    "boaster-webview": "workspace:*",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.86.0",
     "typescript": "^5.0.0"
