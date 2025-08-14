@@ -1,0 +1,27 @@
+{
+  "name": "boaster-vscode",
+  "displayName": "Boaster",
+  "description": "VSCode extension for Boaster platform",
+  "version": "0.0.1",
+  "engines": { "vscode": "^1.86.0" },
+  "activationEvents": ["onCommand:boaster.open"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "boaster.open",
+        "title": "Open Boaster"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "build:webview": "cd webview && next build && next export",
+    "build": "npm run compile && npm run build:webview"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.86.0",
+    "typescript": "^5.0.0"
+  }
+}
