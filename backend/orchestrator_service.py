@@ -1,7 +1,7 @@
 """Standalone FastAPI service for orchestration and evaluation."""
 
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException
 from jinja2 import Template
@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 from backend.database import Base, engine, get_db
 from backend.database.models import Run
 from backend.orchestration import ArtifactStorage, GuardrailPolicy, ReviewGate
+from mcp_tools import call_tool
+from opentelemetry import trace
 
 
 # Initialise database
@@ -22,6 +24,7 @@ app = FastAPI(title="Codex Orchestrator")
 guardrails = GuardrailPolicy()
 review_gate = ReviewGate()
 artifact_storage = ArtifactStorage()
+tracer = trace.get_tracer(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -48,6 +51,7 @@ class RAGStore:
                 path=os.getenv("CHROMA_PATH", "./chroma_store")
             )
             self.collection = self.client.get_or_create_collection("prompts")
+        self.memory: List[str] = []
 
     def get_prompt(self, prompt_id: str) -> str:
         if hasattr(self, "collection") and hasattr(self.collection, "get"):
@@ -59,6 +63,12 @@ class RAGStore:
             if result and result.get("properties") and result["properties"].get("text"):
                 return result["properties"]["text"]
         raise KeyError(f"Prompt {prompt_id} not found")
+
+    def store_memory(self, content: str) -> None:
+        self.memory.append(content)
+
+    def get_memory(self) -> List[str]:
+        return list(self.memory)
 
 
 rag_store = RAGStore()
@@ -78,6 +88,11 @@ class EvalRequest(BaseModel):
     run_id: int
     score: float
     notes: Optional[str] = None
+
+
+class ToolCall(BaseModel):
+    tool: str
+    payload: Dict[str, Any]
 
 
 # ---------------------------------------------------------------------------
@@ -122,11 +137,13 @@ def create_run(run: RunCreate, db: Session = Depends(get_db)) -> Dict[str, Any]:
 @app.get("/prompts/{prompt_id}/render")
 def render_prompt(prompt_id: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Render a prompt template retrieved from the RAG store."""
-
-    template_text = rag_store.get_prompt(prompt_id)
-    template = Template(template_text)
-    rendered = template.render(**(variables or {}))
-    return {"prompt": rendered}
+    with tracer.start_as_current_span("thought.render_prompt"):
+        template_text = rag_store.get_prompt(prompt_id)
+        template = Template(template_text)
+        rendered = template.render(**(variables or {}))
+    rag_store.store_memory(rendered)
+    with tracer.start_as_current_span("output.render_prompt"):
+        return {"prompt": rendered}
 
 
 @app.post("/eval/run")
@@ -145,6 +162,16 @@ def eval_run(req: EvalRequest, db: Session = Depends(get_db)) -> Dict[str, Any]:
     db.commit()
 
     return {"run_id": run.id, "status": run.status}
+
+
+@app.post("/tools/call")
+def tool_call(req: ToolCall) -> Dict[str, Any]:
+    """Invoke an MCP tool and store the result in RAG memory."""
+
+    with tracer.start_as_current_span("tool.call"):
+        result = call_tool(req.tool, req.payload)
+    rag_store.store_memory(str(result))
+    return result
 
 
 __all__ = ["app"]

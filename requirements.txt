@@ -15,3 +15,5 @@ jinja2
 email-validator
 passlib[bcrypt]
 python-jose[cryptography]
+opentelemetry-api
+opentelemetry-sdk
