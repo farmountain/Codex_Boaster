@@ -1,0 +1,14 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
+    source $HOME/.cargo/env
+    cd codex-cli
+    cargo test --verbose
+    cargo build --release --verbose
+  displayName: Build and Test Rust CLI
