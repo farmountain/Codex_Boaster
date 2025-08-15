@@ -10,7 +10,11 @@ from backend.logging.config import (
     setup_performance_logger
 )
 from backend.logging.structured import StructuredLogger, AuditLogger, PerformanceLogger
-from backend.logging.monitoring import monitor_performance
+from backend.logging.monitoring import (
+    monitor_performance,
+    monitor_api_endpoint,
+    monitor_database_query,
+)
 
 def test_log_level():
     # Test default log level

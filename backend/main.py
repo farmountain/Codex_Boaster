@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 import tempfile
+from backend.telemetry import setup_telemetry
 
 from backend.integrations.hipcortex_bridge import HipCortexBridge
 from backend.hipcortex_bridge import router as hipcortex_router
@@ -41,6 +42,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Configure telemetry once the application is created
+if os.getenv("ENABLE_OTEL", "1") == "1":
+    setup_telemetry("codex-booster")
 
 # Routers for each agent
 architect_router = APIRouter(prefix="/architect", tags=["architect"])
