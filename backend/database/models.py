@@ -53,3 +53,15 @@ class Snapshot(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     project = relationship("Project", back_populate="snapshots")
+
+
+class Run(Base):
+    """Store metadata about orchestration runs."""
+
+    __tablename__ = "runs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    plan = Column(String)
+    status = Column(String, default="created")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    artifacts_path = Column(String, nullable=True)
