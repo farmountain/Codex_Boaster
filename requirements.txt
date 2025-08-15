@@ -17,3 +17,5 @@ passlib[bcrypt]
 python-jose[cryptography]
 opentelemetry-api
 opentelemetry-sdk
+opentelemetry-exporter-otlp
+boto3

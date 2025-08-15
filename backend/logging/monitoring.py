@@ -36,6 +36,8 @@ def monitor_performance(component: str, metric: str) -> Callable:
                 raise
         return wrapper
 
+    return decorator
+
 def monitor_api_endpoint(endpoint: str) -> Callable:
     """Decorator to monitor API endpoint performance."""
     def decorator(func: Callable) -> Callable:
@@ -67,6 +69,8 @@ def monitor_api_endpoint(endpoint: str) -> Callable:
                 raise
         return wrapper
 
+    return decorator
+
 def monitor_database_query(query_type: str) -> Callable:
     """Decorator to monitor database query performance."""
     def decorator(func: Callable) -> Callable:
@@ -97,3 +101,5 @@ def monitor_database_query(query_type: str) -> Callable:
                 )
                 raise
         return wrapper
+
+    return decorator
