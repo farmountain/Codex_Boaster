@@ -1,0 +1,69 @@
+{
+  "repo": {
+    "type": "object",
+    "properties": {
+      "action": {"type": "string"},
+      "path": {"type": "string"},
+      "message": {"type": "string"}
+    },
+    "required": ["action"],
+    "additionalProperties": false
+  },
+  "lint": {
+    "type": "object",
+    "properties": {
+      "targets": {"type": "array", "items": {"type": "string"}}
+    },
+    "required": ["targets"],
+    "additionalProperties": false
+  },
+  "test": {
+    "type": "object",
+    "properties": {
+      "path": {"type": "string"}
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "build": {
+    "type": "object",
+    "properties": {
+      "path": {"type": "string"}
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "docs": {
+    "type": "object",
+    "properties": {
+      "path": {"type": "string"}
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "pr": {
+    "type": "object",
+    "properties": {
+      "title": {"type": "string"},
+      "body": {"type": "string"}
+    },
+    "required": ["title"],
+    "additionalProperties": false
+  },
+  "deploy": {
+    "type": "object",
+    "properties": {
+      "env": {"type": "string"}
+    },
+    "required": ["env"],
+    "additionalProperties": false
+  },
+  "eval": {
+    "type": "object",
+    "properties": {
+      "suite": {"type": "string"}
+    },
+    "required": ["suite"],
+    "additionalProperties": false
+  }
+}

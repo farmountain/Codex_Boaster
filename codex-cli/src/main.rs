@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use futures_util::{SinkExt, StreamExt};
 use reqwest::Client;
-use serde_json::json;
+use serde_json::{json, Value};
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::Message;
 
@@ -33,6 +33,8 @@ enum Commands {
     Eval { project: String },
     /// Deploy the project
     Deploy { project: String },
+    /// List available MCP tools
+    Tools,
 }
 
 #[tokio::main]
@@ -89,6 +91,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .send()
                 .await?;
             println!("{}", res.text().await?);
+        }
+        Commands::Tools => {
+            let schemas: Value = serde_json::from_str(include_str!("../../shared/tool_schemas.json"))?;
+            println!("{}", serde_json::to_string_pretty(&schemas)?);
         }
     }
 
