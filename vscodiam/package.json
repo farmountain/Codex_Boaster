@@ -9,10 +9,14 @@
   "browser": "./dist/extension-web.js",
   "extensionKind": ["ui", "web"],
 
-  "activationEvents": ["onCommand:boaster.prepareRelease"],
+  "activationEvents": [
+    "onCommand:boaster.prepareRelease",
+    "onCommand:boaster.ticketToPlan"
+  ],
   "contributes": {
     "commands": [
-      { "command": "boaster.prepareRelease", "title": "Boaster: Prepare Release" }
+      { "command": "boaster.prepareRelease", "title": "Boaster: Prepare Release" },
+      { "command": "boaster.ticketToPlan", "title": "Boaster: Ticket To Plan" }
     ]
   },
 

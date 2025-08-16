@@ -1,0 +1,11 @@
+{
+  "tasks": [
+    {
+      "id": "t1",
+      "action": "echo",
+      "args": {
+        "message": "hello from codex plan"
+      }
+    }
+  ]
+}

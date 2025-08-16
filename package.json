@@ -8,7 +8,8 @@
     "example": "examples"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "evaluate": "./scripts/evaluate.sh"
   },
   "keywords": [],
   "author": "",
