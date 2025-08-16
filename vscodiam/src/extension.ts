@@ -1,33 +1,31 @@
 import * as vscode from 'vscode';
-import { getWebviewContent } from './getWebviewContent';
 
-export function activate(context: vscode.ExtensionContext) {
-  const disposable = vscode.commands.registerCommand('boaster.open', () => {
-    const panel = vscode.window.createWebviewPanel(
-      'boaster',
-      'Boaster',
-      vscode.ViewColumn.One,
-      {
-        enableScripts: true,
-        localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'webview', 'out')]
-      }
+const isWeb = typeof navigator !== 'undefined';
+
+export function activate(ctx: vscode.ExtensionContext) {
+  const cmd = vscode.commands.registerCommand('boaster.prepareRelease', async () => {
+    await vscode.window.showInformationMessage('Preparing release...');
+    if (isWeb) {
+      // Call backend via HTTP/MCP when running in web.
+      return;
+    }
+    const ws = vscode.workspace.workspaceFolders?.[0]?.uri;
+    if (!ws) {
+      vscode.window.showErrorMessage('No workspace open');
+      return;
+    }
+    const { signWorkspace } = await import('./slsa');
+    await signWorkspace(ws);
+    const choice = await vscode.window.showInformationMessage(
+      'Artifact signed. Approve release?',
+      'Approve',
+      'Reject'
     );
-
-    panel.webview.html = getWebviewContent(panel.webview, context.extensionUri);
-
-    panel.webview.onDidReceiveMessage(async (message) => {
-      switch (message.type) {
-        case 'login':
-          await context.globalState.update('token', message.token);
-          return;
-        case 'mcp-request':
-          // TODO: wire to local MCP client
-          return;
-      }
-    });
+    if (choice !== 'Approve') {
+      vscode.window.showWarningMessage('Release aborted');
+    }
   });
-
-  context.subscriptions.push(disposable);
+  ctx.subscriptions.push(cmd);
 }
 
 export function deactivate() {}

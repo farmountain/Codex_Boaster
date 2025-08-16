@@ -5,6 +5,9 @@ use serde_json::{json, Value};
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::Message;
 
+mod credentials;
+use credentials::{load_env, CredentialStore};
+
 #[derive(Parser)]
 #[command(name = "boaster")]
 #[command(about = "CLI for Codex Boaster", long_about = None)]
@@ -35,10 +38,24 @@ enum Commands {
     Deploy { project: String },
     /// List available MCP tools
     Tools,
+    /// Manage stored API credentials
+    Creds {
+        #[command(subcommand)]
+        action: CredAction,
+    },
+}
+
+#[derive(Subcommand)]
+enum CredAction {
+    /// Store a provider API key
+    Set { provider: String, key: String },
+    /// Retrieve a provider API key
+    Get { provider: String },
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    load_env();
     let cli = Cli::parse();
     let client = Client::new();
 
@@ -95,6 +112,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Tools => {
             let schemas: Value = serde_json::from_str(include_str!("../../shared/tool_schemas.json"))?;
             println!("{}", serde_json::to_string_pretty(&schemas)?);
+        }
+        Commands::Creds { action } => {
+            let mut store = CredentialStore::load()?;
+            match action {
+                CredAction::Set { provider, key } => {
+                    store.set(&provider, key);
+                    store.save()?;
+                    println!("stored {}", provider);
+                }
+                CredAction::Get { provider } => {
+                    if let Some(k) = store.get(&provider) {
+                        println!("{}", k);
+                    } else {
+                        eprintln!("no key for {}", provider);
+                    }
+                }
+            }
         }
     }
 

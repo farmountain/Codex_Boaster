@@ -1,5 +1,5 @@
 {
-  "name": "codex_boaster",
+  "name": "codex_boaster-monorepo",
   "version": "1.0.0",
   "description": "This repository contains the scaffolding for **Codex Booster**, an AI-native platform that orchestrates multiple agents to convert user goals into working software. The implementation integrates with **HipCortex** for all memory and reflexion functionality. See `docs/README.md` for an overview of the architecture and development roadmap.",
   "main": "index.js",
@@ -14,6 +14,10 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "private": true,
+  "workspaces": [
+    "vscodiam"
+  ],
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-react": "^7.27.1",

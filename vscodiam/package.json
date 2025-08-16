@@ -1,27 +1,39 @@
 {
-  "name": "boaster-vscode",
-  "displayName": "Boaster",
-  "description": "VSCode extension for Boaster platform",
-  "version": "0.0.1",
-  "engines": { "vscode": "^1.86.0" },
-  "activationEvents": ["onCommand:boaster.open"],
-  "main": "./dist/extension.js",
+  "name": "vscodiam",
+  "displayName": "Vscodiam",
+  "version": "0.1.0",
+  "publisher": "farmountain",
+  "engines": { "vscode": "^1.93.0" },
+  "categories": ["Other"],
+  "main": "./dist/extension-node.js",
+  "browser": "./dist/extension-web.js",
+  "extensionKind": ["ui", "web"],
+
+  "activationEvents": ["onCommand:boaster.prepareRelease"],
   "contributes": {
     "commands": [
-      {
-        "command": "boaster.open",
-        "title": "Open Boaster"
-      }
+      { "command": "boaster.prepareRelease", "title": "Boaster: Prepare Release" }
     ]
   },
+
   "scripts": {
-    "compile": "tsc -p ./",
-    "build": "pnpm run compile"
+    "build": "npm run build:web && npm run build:node",
+    "build:web": "esbuild src/extension.ts --bundle --platform=browser --format=esm --outfile=dist/extension-web.js --target=es2022 --external:vscode --external:crypto --external:fs --external:path",
+    "build:node": "esbuild src/extension.ts --bundle --platform=node --format=cjs --outfile=dist/extension-node.js --target=node18 --external:vscode",
+    "compile": "tsc -p .",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "package": "vsce package --no-dependencies"
   },
+
   "devDependencies": {
-    "boaster-webview": "workspace:*",
-    "@types/node": "^20.0.0",
-    "@types/vscode": "^1.86.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.5.4",
+    "esbuild": "^0.23.0",
+    "@types/node": "^20.14.10",
+    "@types/vscode": "^1.93.0",
+    "eslint": "^9.7.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "vsce": "^2.15.0",
+    "@vscode/test-web": "^0.0.56"
   }
 }
