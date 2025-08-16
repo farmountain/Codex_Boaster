@@ -19,3 +19,4 @@ opentelemetry-api
 opentelemetry-sdk
 opentelemetry-exporter-otlp
 boto3
+python-dotenv
