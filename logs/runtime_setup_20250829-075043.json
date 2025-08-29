@@ -1,0 +1,9 @@
+{
+  "runtimes": {
+    "python": "3.8"
+  },
+  "validation": {
+    "python": false
+  },
+  "timestamp": "20250829-075043"
+}
