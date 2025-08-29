@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    command: python3 -m uvicorn backend.main:app --reload
+    environment:
+    - OPENAI_API_KEY
+    ports:
+    - 3000:3000
+    volumes:
+    - ./:/app
+version: '3'

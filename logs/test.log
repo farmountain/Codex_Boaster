@@ -1,0 +1,2 @@
+2025-08-29 07:50:35,021 - test - INFO - {"timestamp": "2025-08-29T07:50:35.021068", "level": "INFO", "message": "Test info message", "context": {"key": "value"}}
+2025-08-29 07:50:35,021 - test - ERROR - {"timestamp": "2025-08-29T07:50:35.021297", "level": "ERROR", "message": "Test error message", "context": {"error_type": "test"}}
