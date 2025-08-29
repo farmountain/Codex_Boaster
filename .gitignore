@@ -14,7 +14,7 @@ runtime.config.yaml
 docker-compose.yml
 reflexion_logs/
 *.log
-*.pytest_cache/
+.pytest_cache/
 .coverage
 htmlcov/
 
@@ -22,3 +22,9 @@ htmlcov/
 test-results/
 playwright-report/
 test-outputs/
+
+# Frontend build artifacts
+frontend/.next/
+frontend/next-env.d.ts
+frontend/out/
+frontend/dist/
