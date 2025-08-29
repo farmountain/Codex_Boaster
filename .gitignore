@@ -3,3 +3,22 @@ __pycache__/
 frontend/node_modules/
 **/__pycache__/
 target/
+
+# Test artifacts and temporary files
+logs/
+.env
+codex.runtime.json
+codexbooster.config.json
+runtime.config.yaml
+.env.template.json
+docker-compose.yml
+reflexion_logs/
+*.log
+*.pytest_cache/
+.coverage
+htmlcov/
+
+# E2E test artifacts
+test-results/
+playwright-report/
+test-outputs/
