@@ -13,15 +13,11 @@ from fastapi import Depends, HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
-# Renamed SECRET_KEY to JWT_SECRET_KEY to match import expectation
-# It's good practice to use unique names for different types of secrets.
 SECRET_KEY = os.getenv("JWT_SECRET", "secret")
 JWT_SECRET_KEY = SECRET_KEY # remains available for imports
-
 # Added JWT_ALGORITHM as it's imported elsewhere
 # Defaulting to HS256, but ensure this matches your JWT generation/verification logic.
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256") # <--- ADDED THIS LINE
-
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 RATE_LIMIT = int(os.getenv("RATE_LIMIT", "60"))
 RATE_WINDOW = int(os.getenv("RATE_WINDOW", "60"))
 

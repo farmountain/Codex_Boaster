@@ -2,14 +2,16 @@ from typing import Dict
 import os
 import httpx
 
+from .credential_helper import get_api_key
+
 
 def call_ollama_or_openai(prompt: str) -> str:
     """Call Ollama or OpenAI depending on env vars.
 
     Falls back to a local stub when no configuration is provided.
     """
-    ollama_url = os.getenv("OLLAMA_URL")
-    openai_key = os.getenv("OPENAI_API_KEY")
+    ollama_url = get_api_key("OLLAMA_URL")
+    openai_key = get_api_key("OPENAI_API_KEY")
 
     if ollama_url:
         model = os.getenv("OLLAMA_MODEL", "codex")

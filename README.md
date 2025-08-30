@@ -73,6 +73,27 @@ All agent reasoning is captured as **versioned memory snapshots** under `hipcort
 
 This allows auditing decisions and exploring diffs across build attempts.
 
+### Artifact Rollback
+
+Run artifacts such as diffs, test results and documentation are saved under
+`artifacts/` and mirrored to optional object storage. The helper in
+`backend.rollback` can snapshot the directory, tag the current git commit and
+restore a previous state:
+
+```python
+from backend.rollback import create_snapshot, restore_snapshot
+
+# save artifacts and tag the repo
+create_snapshot("release-1")
+
+# later, roll back
+restore_snapshot("release-1")
+```
+
+By default telemetry is enabled and exports traces/metrics via OTLP to
+Tempo/Jaeger and logs to Loki. Environment variables `OTLP_TRACES_ENDPOINT`,
+`OTLP_METRICS_ENDPOINT` and `OTLP_LOGS_ENDPOINT` customise the targets.
+
 ### Exporting the Frontend
 
 The API exposes a convenient route to download the current frontend as a

@@ -83,6 +83,8 @@ def monitor_performance(component: str, metric: str) -> Callable:
                 raise
         return wrapper
 
+    return decorator
+
 def monitor_api_endpoint(endpoint: str) -> Callable:
     """Decorator to monitor API endpoint performance."""
     def decorator(func: Callable) -> Callable:
@@ -112,23 +114,6 @@ def monitor_api_endpoint(endpoint: str) -> Callable:
                     f"Endpoint {endpoint} failed: {str(e)}"
                 )
                 raise
-        return wrapper
-    return decorator
-    
-def monitor_performance(component, metric):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            start_time = time.time()
-            result = func(*args, **kwargs)
-            end_time = time.time()
-            duration = end_time - start_time
-            performance_logger.log(
-                component,
-                metric,
-                duration,
-                f"Function {func.__name__} completed successfully"
-            )
-            return result
         return wrapper
     return decorator
 def monitor_database_query(query_type: str) -> Callable:
@@ -161,3 +146,5 @@ def monitor_database_query(query_type: str) -> Callable:
                 )
                 raise
         return wrapper
+
+    return decorator

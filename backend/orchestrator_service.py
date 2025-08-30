@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from backend.database import Base, engine, get_db
 from backend.database.models import Run
 from backend.orchestration import ArtifactStorage, GuardrailPolicy, ReviewGate
+from backend.telemetry import setup_telemetry
 from mcp_tools import call_tool
 from opentelemetry import trace
 
@@ -19,6 +20,10 @@ from opentelemetry import trace
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Codex Orchestrator")
+
+# Configure telemetry early for the service
+if os.getenv("ENABLE_OTEL", "1") == "1":
+    setup_telemetry("orchestrator")
 
 # Orchestration helpers
 guardrails = GuardrailPolicy()

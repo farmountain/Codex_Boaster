@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 import tempfile
+from backend.telemetry import setup_telemetry
 
 # Import HipCortexBridge and its router
 from backend.integrations.hipcortex_bridge import HipCortexBridge
@@ -75,7 +76,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+if os.getenv("ENABLE_OTEL", "1") == "1":
+    setup_telemetry("codex-booster")
+
 # --- Define APIRouter instances here, BEFORE they are used ---
+architect_router = APIRouter(prefix="/architect", tags=["architect"])
+builder_router = APIRouter(prefix="/builder", tags=["builder"])
+tester_router = APIRouter(prefix="/tester", tags=["tester"])
+reflexion_router = APIRouter(prefix="/reflexion", tags=["reflexion"])
+exporter_router = APIRouter(prefix="/exporter", tags=["exporter"])
+monetizer_router = APIRouter(prefix="/monetizer", tags=["monetizer"])
+# --- End APIRouter definitions ---
 architect_router = APIRouter(prefix="/architect", tags=["architect"])
 builder_router = APIRouter(prefix="/builder", tags=["builder"])
 tester_router = APIRouter(prefix="/tester", tags=["tester"])

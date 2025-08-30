@@ -1,0 +1,12 @@
+{
+  "runtimes": {
+    "python": "3.11",
+    "node": "18",
+    "rust": "1.71"
+  },
+  "validation": {
+    "python": false,
+    "rust": false
+  },
+  "timestamp": "20250829-075036"
+}

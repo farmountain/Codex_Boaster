@@ -25,6 +25,11 @@ include:
 - `FRONTEND_URL` and `NEXT_PUBLIC_API_BASE_URL` for the UI.
 - `API_KEY` and `JWT_SECRET` for API authentication.
 - `RATE_LIMIT` and `RATE_WINDOW` to throttle requests.
+- `ENABLE_OTEL` set to `0` to disable OpenTelemetry exporters.
+- `OTLP_TRACES_ENDPOINT`, `OTLP_METRICS_ENDPOINT` and `OTLP_LOGS_ENDPOINT`
+  for sending traces/metrics to Tempo/Jaeger and logs to Loki.
+- `OBJECT_STORAGE_BUCKET` and optional `OBJECT_STORAGE_ENDPOINT` for
+  uploading run artifacts to external object storage.
 
 Saving the form writes `.env` and a shareable `.env.template.json` with empty
 values. A typical template looks like:
