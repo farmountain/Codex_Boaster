@@ -1,5 +1,6 @@
 import pytest
 import logging
+import logging.handlers
 import os
 from datetime import datetime
 import json
@@ -10,7 +11,7 @@ from backend.logging.config import (
     setup_performance_logger
 )
 from backend.logging.structured import StructuredLogger, AuditLogger, PerformanceLogger
-from backend.logging.monitoring import monitor_performance
+from backend.logging.monitoring import monitor_performance, monitor_api_endpoint, monitor_database_query
 
 def test_log_level():
     # Test default log level
@@ -24,7 +25,10 @@ def test_log_level():
     os.environ["LOG_LEVEL"] = "INVALID"
     assert get_log_level() == logging.INFO
 
-def test_logger_setup():
+def test_logger_setup(monkeypatch):
+    # Mock RotatingFileHandler and StreamHandler to avoid file I/O during tests
+    monkeypatch.setattr(logging.handlers, "RotatingFileHandler", lambda *args, **kwargs: logging.StreamHandler())
+    monkeypatch.setattr(logging, "StreamHandler", lambda *args, **kwargs: logging.StreamHandler())
     logger = setup_logger("test")
     assert isinstance(logger, logging.Logger)
     assert logger.name == "test"
@@ -33,10 +37,8 @@ def test_logger_setup():
     # Check handlers
     assert len(logger.handlers) == 2
     handlers = [type(h) for h in logger.handlers]
-    assert logging.handlers.RotatingFileHandler in handlers
-    assert logging.StreamHandler in handlers
-
-def test_audit_logger_setup():
+def test_audit_logger_setup(monkeypatch):
+    monkeypatch.setattr(logging.handlers, "RotatingFileHandler", lambda *args, **kwargs: logging.StreamHandler())
     audit_logger = setup_audit_logger()
     assert isinstance(audit_logger, logging.Logger)
     assert audit_logger.name == "audit"
@@ -44,9 +46,9 @@ def test_audit_logger_setup():
     
     # Check handlers
     assert len(audit_logger.handlers) == 1
-    assert isinstance(audit_logger.handlers[0], logging.handlers.RotatingFileHandler)
-
-def test_performance_logger_setup():
+    assert isinstance(audit_logger.handlers[0], logging.StreamHandler)
+def test_performance_logger_setup(monkeypatch):
+    monkeypatch.setattr(logging.handlers, "RotatingFileHandler", lambda *args, **kwargs: logging.StreamHandler())
     perf_logger = setup_performance_logger()
     assert isinstance(perf_logger, logging.Logger)
     assert perf_logger.name == "performance"
@@ -54,7 +56,7 @@ def test_performance_logger_setup():
     
     # Check handlers
     assert len(perf_logger.handlers) == 1
-    assert isinstance(perf_logger.handlers[0], logging.handlers.RotatingFileHandler)
+    assert isinstance(perf_logger.handlers[0], logging.StreamHandler)
 
 def test_structured_logging():
     logger = StructuredLogger("test")

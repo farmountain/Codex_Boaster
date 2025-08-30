@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"Codex Booster MCP": {
+			"url": "http://localhost:8000",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}

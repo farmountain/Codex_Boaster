@@ -1,0 +1,17 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/agents/architect/page": "app/agents/architect/page.js",
+  "/(auth)/register/page": "app/(auth)/register/page.js",
+  "/agents/builder/page": "app/agents/builder/page.js",
+  "/agents/reflexion/page": "app/agents/reflexion/page.js",
+  "/analytics/page": "app/analytics/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/export/page": "app/export/page.js",
+  "/billing/page": "app/billing/page.js",
+  "/setup/page": "app/setup/page.js",
+  "/marketplace/page": "app/marketplace/page.js",
+  "/page": "app/page.js",
+  "/prompts/page": "app/prompts/page.js",
+  "/agents/configure/page": "app/agents/configure/page.js"
+}

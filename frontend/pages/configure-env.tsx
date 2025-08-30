@@ -1,3 +1,4 @@
+import { RuntimeConfig, runtimeDefaults } from '../src/runtime.config.schema'
 import { useState } from 'react'
 import RuntimeSelector from '../components/RuntimeSelector'
 import EnvVarForm from '../components/EnvVarForm'

@@ -1,3 +1,50 @@
+def monitor_performance(component, metric):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            # ... performance monitoring logic ...
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+def monitor_api_endpoint(endpoint):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            # ... API endpoint monitoring logic ...
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+def monitor_database_query(query_type: str) -> Callable:
+    """Decorator to monitor database query performance."""
+    def decorator(func: Callable) -> Callable:
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            start_time = time.time()
+            try:
+                result = func(*args, **kwargs)
+                end_time = time.time()
+                duration = end_time - start_time
+                
+                performance_logger.log(
+                    "database",
+                    query_type,
+                    duration,
+                    f"Query {query_type} completed successfully"
+                )
+                return result
+            except Exception as e:
+                end_time = time.time()
+                duration = end_time - start_time
+                
+                performance_logger.log(
+                    "database",
+                    query_type,
+                    duration,
+                    f"Query {query_type} failed: {str(e)}"
+                )
+                raise
+        return wrapper
+    return decorator
 from typing import Dict, Any, Callable
 import time
 from functools import wraps
@@ -66,7 +113,24 @@ def monitor_api_endpoint(endpoint: str) -> Callable:
                 )
                 raise
         return wrapper
-
+    return decorator
+    
+def monitor_performance(component, metric):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            result = func(*args, **kwargs)
+            end_time = time.time()
+            duration = end_time - start_time
+            performance_logger.log(
+                component,
+                metric,
+                duration,
+                f"Function {func.__name__} completed successfully"
+            )
+            return result
+        return wrapper
+    return decorator
 def monitor_database_query(query_type: str) -> Callable:
     """Decorator to monitor database query performance."""
     def decorator(func: Callable) -> Callable:

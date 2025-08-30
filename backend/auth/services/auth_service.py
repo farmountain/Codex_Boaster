@@ -1,3 +1,4 @@
+# backend/auth/services/auth_service.py
 from datetime import datetime, timedelta
 from typing import Optional
 from passlib.context import CryptContext
@@ -6,9 +7,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from ..models.user import User
+# Corrected import to include UserCreate and UserInDB from models.user
+from ..models.user import User, UserCreate, UserInDB # <--- UPDATED THIS LINE
 from ...database import get_db
-from ...security import JWT_SECRET_KEY, JWT_ALGORITHM
+from backend.security import JWT_SECRET_KEY, JWT_ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -59,11 +61,14 @@ class AuthService:
         return self.db.query(User).filter(User.email == email).first()
 
     def create_user(self, user: UserCreate) -> User:
+        # Note: Your User model in the database needs a 'password_hash' field
+        # and not directly 'password'. Ensure your backend/database/models.py
+        # aligns with this.
         db_user = User(
             email=user.email,
             username=user.username,
             role=user.role,
-            password_hash=self.get_password_hash(user.password)
+            password_hash=self.get_password_hash(user.password) # Hashes the password
         )
         self.db.add(db_user)
         self.db.commit()
@@ -75,3 +80,4 @@ class AuthService:
         self.db.commit()
         self.db.refresh(user)
         return user
+

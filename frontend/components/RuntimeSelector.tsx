@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { RuntimeConfig, runtimeDefaults } from '../../shared/runtime.config.schema'
+import { RuntimeConfig, runtimeDefaults } from '../src/runtime.config.schema'
 
 const options: Record<keyof RuntimeConfig, string[]> = {
   python: ['3.12'],

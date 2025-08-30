@@ -1,4 +1,16 @@
-"""FastAPI application entry point for Codex Booster."""
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from backend.auth import delete_account
+# ...existing code...
+# ...existing code...
+
+# backend/main.py (relevant section for imports and router inclusion)
+# ...existing code...
+app = FastAPI(title="Codex Booster")
+# ...existing code...
+
+    # /auth/delete_account endpoint is now registered via auth_router
+# backend/main.py (relevant section for imports and router inclusion)
 
 import os
 
@@ -9,16 +21,20 @@ from pydantic import BaseModel
 from pathlib import Path
 import tempfile
 
+# Import HipCortexBridge and its router
 from backend.integrations.hipcortex_bridge import HipCortexBridge
 from backend.hipcortex_bridge import router as hipcortex_router
+
+# Import your agents
 from backend.agents.architect_agent import ArchitectAgent
 from backend.agents.builder_agent import BuilderAgent
 from backend.agents.tester_agent import TesterAgent
 from backend.agents.reflexion_agent import ReflexionAgent
 from backend.agents.exporter_agent import ExporterAgent
 from backend.agents.monetizer_agent import MonetizerAgent
+
+# Import other routers you have defined
 from backend.monetizer_agent import router as payment_router
-from backend.services.workflow import build_test_cycle
 from backend.marketplace import router as marketplace_router
 from backend.architect_agent import router as project_plan_router
 from backend.config_agent import router as config_router
@@ -33,24 +49,46 @@ from backend.chat_agent import router as chat_router
 from backend.terminal_runner import router as terminal_runner_router
 from backend.auth import router as auth_router
 
+# Import workflow service (if needed for direct calls, though agents might wrap it)
+from backend.services.workflow import build_test_cycle
+
+# Import your new MCP router's creation function
+from backend.mcp_router import create_mcp_router
+
 app = FastAPI(title="Codex Booster")
+
+# Configure CORS for local development and Copilot access
+# IMPORTANT: In production, restrict origins!
+origins = [
+    "http://localhost:3000",  # Your frontend
+    "http://127.0.0.1:3000",
+    "vscode-webview://*", # This might be needed for VS Code webview context
+    "https://*.ngrok-free.app", # If using ngrok
+    "https://*.github.dev" # For github.dev codespaces or web IDE
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routers for each agent
+# --- Define APIRouter instances here, BEFORE they are used ---
 architect_router = APIRouter(prefix="/architect", tags=["architect"])
 builder_router = APIRouter(prefix="/builder", tags=["builder"])
 tester_router = APIRouter(prefix="/tester", tags=["tester"])
 reflexion_router = APIRouter(prefix="/reflexion", tags=["reflexion"])
 exporter_router = APIRouter(prefix="/exporter", tags=["exporter"])
 monetizer_router = APIRouter(prefix="/monetizer", tags=["monetizer"])
+# --- End APIRouter definitions ---
 
+
+# Initialize HipCortexBridge
 hipcortex = HipCortexBridge(base_url=os.getenv("HIPCORTEX_URL", "http://hipcortex"))
+
+# Initialize your agents with the HipCortexBridge instance
 architect_agent = ArchitectAgent(hipcortex)
 builder_agent = BuilderAgent(hipcortex)
 tester_agent = TesterAgent(hipcortex)
@@ -59,66 +97,83 @@ exporter_agent = ExporterAgent(hipcortex)
 monetizer_agent = MonetizerAgent(hipcortex)
 
 
+# Dependency injection functions for agents
 def get_architect_agent() -> ArchitectAgent:
     return architect_agent
-
 
 def get_builder_agent() -> BuilderAgent:
     return builder_agent
 
-
 def get_tester_agent() -> TesterAgent:
     return tester_agent
-
 
 def get_reflexion_agent() -> ReflexionAgent:
     return reflexion_agent
 
-
 def get_exporter_agent() -> ExporterAgent:
     return exporter_agent
-
 
 def get_monetizer_agent() -> MonetizerAgent:
     return monetizer_agent
 
 
-# in-memory store for latest test results
+# In-memory store for latest test results and improvement suggestions
 latest_test_results = {"success": None, "output": ""}
 latest_improvement = {"suggestion": ""}
 
 
+# Pydantic models for request bodies
 class PlanRequest(BaseModel):
     goal: str
 
-
 class BuildRequest(BaseModel):
     tests: str
-
 
 class RunTestsRequest(BaseModel):
     code: str
     tests: str
 
-
 class ReflexRequest(BaseModel):
     feedback: str
 
-
 class ExportRequest(BaseModel):
     path: str
-
 
 class ChargeRequest(BaseModel):
     user_id: str
     amount: int
 
 
+# Root endpoint
 @app.get("/")
+
 async def root():
-    return {"message": "Codex Booster API"}
+    return {"message": "Codex Booster Backend is running!"}
+
+# Access control endpoint for restricted pages
+import backend.auth.access_manager
+from fastapi.responses import JSONResponse
+
+@app.get("/restricted/page")
+async def restricted_page():
+    # Pass required arguments to check_access (user, page)
+    access = backend.auth.access_manager.check_access(None, "restricted/page")
+    if not access.get("access_granted", False):
+        return JSONResponse(
+            status_code=403,
+            content={
+                "access_granted": False,
+                "redirect_url": access.get("redirect_url", "/login"),
+                "warning_logged": access.get("warning_logged", True)
+            }
+        )
+    return JSONResponse(
+        status_code=200,
+        content={"access_granted": True}
+    )
 
 
+# Direct API endpoints for agents (if you still use them directly)
 @app.post("/plan")
 async def plan_root(
     req: PlanRequest, agent: ArchitectAgent = Depends(get_architect_agent)
@@ -158,6 +213,7 @@ async def reflect_root(
 async def export_root(
     req: ExportRequest, agent: ExporterAgent = Depends(get_exporter_agent)
 ):
+    """Export an artifact and return archive path."""
     archive = agent.export(req.path)
     return {"archive": archive}
 
@@ -169,7 +225,8 @@ async def export_frontend(agent: ExporterAgent = Depends(get_exporter_agent)):
     return FileResponse(archive, filename=Path(archive).name)
 
 
-@architect_router.post("/plan")
+# Router-specific endpoints (these are likely what you're using for your UI)
+@project_plan_router.post("/plan") # Assuming this is architect_router
 async def plan_architecture(
     req: PlanRequest, agent: ArchitectAgent = Depends(get_architect_agent)
 ):
@@ -177,14 +234,14 @@ async def plan_architecture(
     return agent.plan(req.goal)
 
 
-@builder_router.post("/build")
-async def build(req: BuildRequest, agent: BuilderAgent = Depends(get_builder_agent)):
+@code_builder_router.post("/build") # Assuming this is builder_router
+async def build_code(req: BuildRequest, agent: BuilderAgent = Depends(get_builder_agent)):
     """Generate code from tests."""
     code = agent.build(req.tests)
     return {"code": code}
 
 
-@builder_router.post("/build_and_test")
+@code_builder_router.post("/build_and_test")
 async def build_and_test(
     req: BuildRequest,
     builder: BuilderAgent = Depends(get_builder_agent),
@@ -202,8 +259,8 @@ async def build_and_test(
     return {"code": code, "success": success}
 
 
-@tester_router.post("/run")
-async def run_tests(
+@run_test_router.post("/run") # Assuming this is tester_router
+async def run_tests_endpoint(
     req: RunTestsRequest, agent: TesterAgent = Depends(get_tester_agent)
 ):
     """Run tests against provided code."""
@@ -215,8 +272,8 @@ async def run_tests(
     return {"success": success, "output": agent.last_output}
 
 
-@reflexion_router.post("/reflect")
-async def reflect(
+@improvement_router.post("/reflect") # Assuming this is reflexion_router
+async def reflect_endpoint(
     req: ReflexRequest, agent: ReflexionAgent = Depends(get_reflexion_agent)
 ):
     """Provide reflexion feedback."""
@@ -225,7 +282,7 @@ async def reflect(
 
 
 @exporter_router.post("/export")
-async def export(
+async def export_endpoint(
     req: ExportRequest, agent: ExporterAgent = Depends(get_exporter_agent)
 ):
     """Export an artifact and return archive path."""
@@ -233,8 +290,8 @@ async def export(
     return {"archive": archive}
 
 
-@monetizer_router.post("/charge")
-async def charge(
+@payment_router.post("/charge") # Assuming this is monetizer_router
+async def charge_endpoint(
     req: ChargeRequest, agent: MonetizerAgent = Depends(get_monetizer_agent)
 ):
     """Charge the user for usage."""
@@ -254,26 +311,34 @@ async def get_improvement_suggestion():
     return latest_improvement
 
 
+# Include all routers
+app.include_router(hipcortex_router, prefix="/hipcortex")
 
+# Create the MCP router by passing the initialized dependencies
+mcp_router_instance = create_mcp_router(
+    hipcortex_bridge=hipcortex,
+    architect_agent=architect_agent,
+    builder_agent=builder_agent,
+    tester_agent=tester_agent,
+    # Pass other agents here if you expose them via MCP
+)
+app.include_router(mcp_router_instance, prefix="/api") # MCP router (e.g., /api/mcp/tool)
 
-app.include_router(architect_router)
-app.include_router(builder_router)
-app.include_router(tester_router)
-app.include_router(reflexion_router)
-app.include_router(exporter_router)
-app.include_router(payment_router)
-app.include_router(monetizer_router)
+# Include your other routers
 app.include_router(marketplace_router)
 app.include_router(doc_router)
-app.include_router(improvement_router)
 app.include_router(chat_router)
-app.include_router(project_plan_router)
 app.include_router(config_router)
 app.include_router(repo_init_router)
-app.include_router(code_builder_router)
-app.include_router(run_test_router)
 app.include_router(test_suite_router)
 app.include_router(deploy_router)
-app.include_router(hipcortex_router)
 app.include_router(terminal_runner_router)
 app.include_router(auth_router)
+
+# Note: The following routers are likely already included via the specific agent routers above
+# app.include_router(architect_router) # Covered by project_plan_router
+# app.include_router(builder_router)   # Covered by code_builder_router
+# app.include_router(tester_router)    # Covered by run_test_router
+# app.include_router(reflexion_router) # Covered by improvement_router
+# app.include_router(exporter_router)  # Covered by exporter_router
+# app.include_router(monetizer_router) # Covered by payment_router
